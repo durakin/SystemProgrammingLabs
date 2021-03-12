@@ -1,13 +1,28 @@
+/*! \file   main.c
+ *  \brief  Main file of the program. Contains main function
+ */
+
 #include <malloc.h>
 #include "thread.h"
+#include "input.h"
 #include <stdbool.h>
-int main(int argc, char* argv[])
+
+
+/*! \brief Main function
+ *
+ *  \details Main function. Initialise Airfield, aircrafts numeration
+ *  variable, and performs a task. Also provides minimal UI.
+ *
+ *  \return Doesn't return anything. According to the task, works infinitely.
+ */
+int main()
 {
-    int n = 5;
+    printf("Enter number of landing strips ( [1, 1000] )\n");
+    int n = CheckedInputInt(NumberOfStripsInputCheck);
 
-    int aircraftNumber = 1;
+    int aircraftNumber = FIRST_AIRCRAFT_NUMBER;
 
-    airfield* airfieldObject = (airfield*) malloc(sizeof(airfield));
+    Airfield* airfieldObject = (Airfield*) malloc(sizeof(Airfield));
     airfieldObject->landingStrips = (int*) malloc(n * sizeof(int));
     airfieldObject->numberOfStrips = n;
 
@@ -21,7 +36,7 @@ int main(int argc, char* argv[])
 
     while (true)
     {
-        aircraft* aircraftObject = (aircraft*) malloc(sizeof(aircraft));
+        Aircraft* aircraftObject = (Aircraft*) malloc(sizeof(Aircraft));
         aircraftObject->airfieldObject = airfieldObject;
         aircraftObject->number = aircraftNumber++;
         aircraftObject->strip = NULL;
@@ -32,6 +47,5 @@ int main(int argc, char* argv[])
         randomNanosleep(MIN_SLEEP, SMALL_SLEEP);
 
     }
-
 
 }

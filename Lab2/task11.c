@@ -1,6 +1,10 @@
+/*! \file   task11.c
+ *  \brief  Implements functions of task11.h
+ */
+
 #include "task11.h"
 
-void landAircraft(aircraft* aircraftToLand)
+void landAircraft(Aircraft* aircraftToLand)
 {
     for (int i = 0; i < aircraftToLand->airfieldObject->numberOfStrips; i++)
     {
@@ -13,8 +17,13 @@ void landAircraft(aircraft* aircraftToLand)
     }
 }
 
+bool NumberOfStripsInputCheck(int intToCheck)
+{
+    return intToCheck >= N_MIN && intToCheck <= N_MAX;
+}
 
-void randomNanosleep(int minSeconds, int maxSeconds) {
+void randomNanosleep(int minSeconds, int maxSeconds)
+{
     struct timespec time;
     int sec = (int) random() % maxSeconds + minSeconds;
     time.tv_sec = sec;
