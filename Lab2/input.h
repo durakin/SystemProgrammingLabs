@@ -24,7 +24,7 @@ enum sizes
  *  \param bool* Pointer to the function that checks additional condition.
  *  \return Integer read correct integer.
  */
-int CheckedInputInt(bool(* additionalCheck)(int));
+int checkedInputInt(bool(* additionalCheck)(int));
 
 
 #endif //INPUT_H

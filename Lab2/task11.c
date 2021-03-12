@@ -17,7 +17,7 @@ void landAircraft(Aircraft* aircraftToLand)
     }
 }
 
-bool NumberOfStripsInputCheck(int intToCheck)
+bool numberOfStripsInputCheck(int intToCheck)
 {
     return intToCheck >= N_MIN && intToCheck <= N_MAX;
 }

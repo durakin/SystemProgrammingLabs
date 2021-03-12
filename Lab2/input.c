@@ -4,7 +4,7 @@
 
 #include "input.h"
 
-int CheckedInputInt(bool(* additionalCheck)(int))
+int checkedInputInt(bool(* additionalCheck)(int))
 {
     int result;
     char inputString[INPUT_SIZE];

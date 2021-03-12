@@ -18,7 +18,7 @@
 int main()
 {
     printf("Enter number of landing strips ( [1, 1000] )\n");
-    int n = CheckedInputInt(NumberOfStripsInputCheck);
+    int n = checkedInputInt(numberOfStripsInputCheck);
 
     int aircraftNumber = FIRST_AIRCRAFT_NUMBER;
 

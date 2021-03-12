@@ -1,4 +1,4 @@
-/*! \file   task14.h
+/*! \file   task11.h
  *  \brief  Header file of functions essential for task 11
  */
 
@@ -89,7 +89,7 @@ void landAircraft(Aircraft* aircraftToLand);
  *  \return true if number can be a number of landing strips for task 11
  *  false - otherwise
  */
-bool NumberOfStripsInputCheck(int intToCheck);
+bool numberOfStripsInputCheck(int intToCheck);
 
 /*! \brief Calls nanosleep function with random amount of seconds and 0
  *  nanoseconds
