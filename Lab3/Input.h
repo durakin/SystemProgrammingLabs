@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+
 /*! \enum
  *  \brief  Size of string for input
  */

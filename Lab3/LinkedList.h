@@ -1,12 +1,9 @@
-//
-// Created by Albert Nepomnyashiy on 3/25/2021.
-//
-
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
 #include <malloc.h>
 #include <stdbool.h>
+
 
 typedef struct ListLink
 {
@@ -14,6 +11,7 @@ typedef struct ListLink
     struct ListLink* next;
     void* content;
 } ListLink;
+
 
 ListLink* ListLinkHead(ListLink* objectList);
 
@@ -32,7 +30,7 @@ void ListLinkBubbleSort(ListLink* objectList,
 
 void ListLinkFree(ListLink* objectList);
 
-void ListLinkSearchFromHead(ListLink* objectList, void* (*action) (void*));
+void ListLinkSearchFromHead(ListLink* objectList, void* (* action)(void*));
 
 
 #endif //LINKEDLIST_H

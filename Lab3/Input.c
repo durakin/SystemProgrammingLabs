@@ -4,6 +4,7 @@
 
 #include "input.h"
 
+
 int checkedInputInt(bool(* additionalCheck)(int))
 {
     int result;

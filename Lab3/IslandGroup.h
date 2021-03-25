@@ -1,7 +1,3 @@
-//
-// Created by Albert Nepomnyashiy on 3/25/2021.
-//
-
 #ifndef ISLANDGROUP_H
 #define ISLANDGROUP_H
 
@@ -20,15 +16,16 @@ void PrintIslandGroupLink(ListLink* object);
 
 void PrintAllIslandGroups(ListLink* objectList);
 
-/*void PrintIslandGroupsByIslands(ListLink* objectList, int islands);
+// void PrintIslandGroupsByIslands(ListLink* objectList, int islands);
 
 bool AnyUnInhabitedIslandGroups(ListLink* objectList);
-*/
+
 ListLink* FindIslandGroupLinkByName(ListLink* objectList, char* name);
 
 ListLink* AddIslandGroup(ListLink* objectList, char* name, int islands,
                          int inhabitedIslands);
 
 int DeleteIslandGroupByName(ListLink** objectList, char* name);
+
 
 #endif //ISLANDGROUP_H

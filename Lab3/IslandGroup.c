@@ -4,7 +4,7 @@
 
 void PrintIslandGroupLink(ListLink* object)
 {
-    if (object==NULL)
+    if (object == NULL)
     {
         printf("No such island group\n");
         return;
@@ -17,7 +17,7 @@ void PrintIslandGroupLink(ListLink* object)
 
 void PrintAllIslandGroups(ListLink* objectList)
 {
-    if(objectList != NULL)
+    if (objectList != NULL)
     {
         ListLinkSearchFromHead(objectList, (void*) PrintIslandGroupLink);
     }
@@ -31,9 +31,21 @@ void PrintAllIslandGroups(ListLink* objectList)
 {
 
 };
-
-bool AnyUnInhabitedIslandGroups(ListLink* objectList);
 */
+
+bool AnyUnInhabitedIslandGroups(ListLink* objectList)
+{
+    ListLink* position;
+    position = ListLinkHead(objectList);
+    while (position != NULL)
+    {
+        if (((IslandGroup*) position->content)->inhabitedIslands == 0)
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 ListLink* FindIslandGroupLinkByName(ListLink* objectList, char* name)
 {
@@ -41,7 +53,7 @@ ListLink* FindIslandGroupLinkByName(ListLink* objectList, char* name)
     position = ListLinkHead(objectList);
     while (position != NULL)
     {
-        if(strcmp(((IslandGroup*)position->content)->name, name) == 0)
+        if (strcmp(((IslandGroup*) position->content)->name, name) == 0)
         {
             break;
         }
@@ -53,12 +65,13 @@ ListLink* FindIslandGroupLinkByName(ListLink* objectList, char* name)
 ListLink* AddIslandGroup(ListLink* objectList, char* name, int islands,
                          int inhabitedIslands)
 {
-    if(FindIslandGroupLinkByName(objectList, name) != NULL)
+    if (FindIslandGroupLinkByName(objectList, name) != NULL ||
+        islands < 1 ||inhabitedIslands > islands)
     {
         return NULL;
     }
     IslandGroup* newIslandGroup;
-    newIslandGroup = (IslandGroup* ) malloc(sizeof(IslandGroup));
+    newIslandGroup = (IslandGroup*) malloc(sizeof(IslandGroup));
     stpcpy(newIslandGroup->name, name);
     newIslandGroup->islands = islands;
     newIslandGroup->inhabitedIslands = inhabitedIslands;
@@ -67,8 +80,8 @@ ListLink* AddIslandGroup(ListLink* objectList, char* name, int islands,
 
 int DeleteIslandGroupByName(ListLink** objectList, char* name)
 {
-    if(FindIslandGroupLinkByName(*objectList, name) == NULL) return -1;
-    *objectList = ListLinkDelete(FindIslandGroupLinkByName(*objectList, name));
+    if (FindIslandGroupLinkByName(*objectList, name) == NULL) return -1;
+    *objectList = ListLinkDelete(
+            FindIslandGroupLinkByName(*objectList, name));
     return 0;
-};
-
+}

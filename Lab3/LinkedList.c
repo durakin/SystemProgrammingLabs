@@ -1,4 +1,3 @@
-
 #include "LinkedList.h"
 
 
@@ -16,7 +15,6 @@ ListLink* ListLinkHead(ListLink* objectList)
     }
     return position;
 }
-
 
 ListLink* ListLinkTail(ListLink* objectList)
 {
@@ -60,7 +58,6 @@ void ListLinkSearchFromHead(ListLink* objectList, void* (* action)(void*))
     }
 }
 
-
 ListLink* ListLinkAdd(ListLink* objectList, void* content)
 {
     ListLink* linkToAdd;
@@ -75,7 +72,6 @@ ListLink* ListLinkAdd(ListLink* objectList, void* content)
     }
     return linkToAdd;
 }
-
 
 ListLink* ListLinkDelete(ListLink* linkToDelete)
 {
@@ -98,7 +94,6 @@ ListLink* ListLinkDelete(ListLink* linkToDelete)
     return linkToReturn;
 }
 
-
 void ListLinkSwap(ListLink* firstLink, ListLink* secondLink)
 {
     void* contentBox;
@@ -106,7 +101,6 @@ void ListLinkSwap(ListLink* firstLink, ListLink* secondLink)
     firstLink->content = secondLink->content;
     secondLink->content = contentBox;
 }
-
 
 int ListLinkSize(ListLink* objectList)
 {
@@ -126,9 +120,8 @@ int ListLinkSize(ListLink* objectList)
     return size;
 }
 
-
-void
-ListLinkBubbleSort(ListLink* objectList, bool(* comparator)(void*, void*))
+void ListLinkBubbleSort(ListLink* objectList,
+                        bool(* comparator)(void*, void*))
 {
     ListLink* position;
     position = NULL;
@@ -147,7 +140,6 @@ ListLinkBubbleSort(ListLink* objectList, bool(* comparator)(void*, void*))
         }
     }
 }
-
 
 void ListLinkFree(ListLink* objectList)
 {
