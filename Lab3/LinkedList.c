@@ -73,7 +73,7 @@ ListLink* ListLinkAdd(ListLink* objectList, void* content)
     return linkToAdd;
 }
 
-ListLink* ListLinkDelete(ListLink* linkToDelete)
+ListLink* ListLinkDelete(ListLink* linkToDelete, void* (* freeContent)(void*))
 {
     ListLink* linkToReturn;
     if (linkToDelete->next != NULL)
@@ -89,7 +89,7 @@ ListLink* ListLinkDelete(ListLink* linkToDelete)
     {
         linkToReturn = linkToDelete->next;
     }
-    free(linkToDelete->content);
+    freeContent(linkToDelete->content);
     free(linkToDelete);
     return linkToReturn;
 }
@@ -141,12 +141,12 @@ void ListLinkBubbleSort(ListLink* objectList,
     }
 }
 
-void ListLinkFree(ListLink* objectList)
+void ListLinkFree(ListLink* objectList, void* (* freeContent)(void*))
 {
     ListLink* position;
     position = ListLinkHead(objectList);
     while (position != NULL)
     {
-        position = ListLinkDelete(position);
+        position = ListLinkDelete(position, freeContent);
     }
 }

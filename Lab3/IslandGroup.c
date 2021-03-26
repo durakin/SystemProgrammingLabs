@@ -2,6 +2,12 @@
 #include <string.h>
 
 
+void FreeIslandGroup(IslandGroup* objectIslandGroup)
+{
+    free(objectIslandGroup->name);
+    free (objectIslandGroup);
+}
+
 void PrintIslandGroupLink(ListLink* object)
 {
     if (object == NULL)
@@ -27,11 +33,26 @@ void PrintAllIslandGroups(ListLink* objectList)
     }
 }
 
-/*void PrintIslandGroupsByIslands(ListLink* objectList, int islands)
+ListLink* ListLinkIslandGroupsByIslands(ListLink* objectList, int islands)
 {
+    ListLink* targetList;
+    targetList = NULL;
+    ListLink* position;
+    position = ListLinkHead(objectList);
+    IslandGroup* positionContent;
+    while (position != NULL)
+    {
+        positionContent = (IslandGroup*) position->content;
+        if (positionContent->islands == islands)
+        {
+            // ListLinkAdd(targetList, (IslandGroup*) position->content);
+            targetList = AddIslandGroup(targetList, positionContent->name, positionContent->islands,
+                                        positionContent->inhabitedIslands);
+        }
+      }
+    return targetList;
+}
 
-};
-*/
 
 bool AnyUnInhabitedIslandGroups(ListLink* objectList)
 {
@@ -72,6 +93,7 @@ ListLink* AddIslandGroup(ListLink* objectList, char* name, int islands,
     }
     IslandGroup* newIslandGroup;
     newIslandGroup = (IslandGroup*) malloc(sizeof(IslandGroup));
+    newIslandGroup->name =(char*) malloc(sizeof(name));
     stpcpy(newIslandGroup->name, name);
     newIslandGroup->islands = islands;
     newIslandGroup->inhabitedIslands = inhabitedIslands;
@@ -80,8 +102,55 @@ ListLink* AddIslandGroup(ListLink* objectList, char* name, int islands,
 
 int DeleteIslandGroupByName(ListLink** objectList, char* name)
 {
-    if (FindIslandGroupLinkByName(*objectList, name) == NULL) return -1;
+    if (FindIslandGroupLinkByName(*objectList, name) == NULL)
+    {
+        return -1;
+    }
     *objectList = ListLinkDelete(
-            FindIslandGroupLinkByName(*objectList, name));
+                  FindIslandGroupLinkByName(*objectList, name),
+                  (void*) FreeIslandGroup);
+    return 0;
+}
+
+int ChangeIslandGroupName(ListLink* objectLink, char* newName)
+{
+    if (objectLink == NULL || FindIslandGroupLinkByName(objectLink, newName) != NULL)
+    {
+        return -1;
+    }
+    free(((IslandGroup*)objectLink->content)->name);
+    ((IslandGroup*)objectLink->content)->name = newName;
+    return 0;
+}
+
+int ChangeIslandGroupIslands(ListLink* objectLink, int newIslands)
+{
+    if (objectLink == NULL)
+    {
+        return -1;
+    }
+    IslandGroup* objectContent;
+    objectContent = (IslandGroup*)objectLink->content;
+    if(newIslands < objectContent->inhabitedIslands)
+    {
+        objectContent->inhabitedIslands = newIslands;
+    }
+    objectContent->islands = newIslands;
+    return 0;
+}
+
+int ChangeInhabitedIslandGroupIslands(ListLink* objectLink, int newInhabitedIsland)
+{
+    if (objectLink == NULL)
+    {
+        return -1;
+    }
+    IslandGroup* objectContent;
+    objectContent = (IslandGroup*)objectLink->content;
+    if(newInhabitedIsland > objectContent->islands)
+    {
+        return -1;
+    }
+    objectContent->inhabitedIslands = newInhabitedIsland;
     return 0;
 }

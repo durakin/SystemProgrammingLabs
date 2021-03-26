@@ -2,7 +2,7 @@
  *  \brief  Implements functions of input.h
  */
 
-#include "input.h"
+#include "Input.h"
 
 
 int checkedInputInt(bool(* additionalCheck)(int))

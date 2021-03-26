@@ -19,7 +19,7 @@ ListLink* ListLinkTail(ListLink* objectList);
 
 ListLink* ListLinkAdd(ListLink* objectList, void* content);
 
-ListLink* ListLinkDelete(ListLink* linkToDelete);
+ListLink* ListLinkDelete(ListLink* linkToDelete, void* (* freeContent)(void*));
 
 void ListLinkSwap(ListLink* firstLink, ListLink* secondLink);
 
@@ -28,7 +28,7 @@ int ListLinkSize(ListLink* objectList);
 void ListLinkBubbleSort(ListLink* objectList,
                         bool(* comparator)(void*, void*));
 
-void ListLinkFree(ListLink* objectList);
+void ListLinkFree(ListLink* objectList, void* (* freeContent)(void*));
 
 void ListLinkSearchFromHead(ListLink* objectList, void* (* action)(void*));
 
