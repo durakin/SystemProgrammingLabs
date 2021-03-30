@@ -198,13 +198,14 @@ int main()
                                           newName) == 0)
                 {
                     printf("Name changed!");
+                    newName = NULL;
                 }
                 else
                 {
                     printf("Either new name is taken, or there is no island group with such name");
+                    free(newName);
                 }
                 free(originalName);
-                free(newName);
             }
             if (subOperationCode == MODIFY_ISLANDS)
             {
