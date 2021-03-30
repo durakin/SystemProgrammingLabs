@@ -1,3 +1,7 @@
+/*! \file   LinkedList.c
+ *  \brief  Implements functions of LinkedList.h
+ */
+
 #include "LinkedList.h"
 
 

@@ -1,5 +1,5 @@
 /*! \file   input.c
- *  \brief  Implements functions of input.h
+ *  \brief  Implements functions of input.h and functions required  by them
  */
 
 #include "Input.h"
@@ -28,6 +28,13 @@ int CycledCheckedInputInt(bool(* additionalCheck)(int))
     }
 }
 
+/*! \brief Reads string dynamically allocating memory
+*
+*  \details Reads string. Possible memory leak: returns a pointer to
+*  allocated memory.
+*
+*  \return char* read string.
+*/
 char* StrDynInput()
 {
     char* userStr = (char*) malloc(sizeof(char));
@@ -93,12 +100,6 @@ char* StrDynInput()
 
 char* CycledCheckedInputString(bool(* additionalCheck)(char*))
 {
-    // Функция для ввода строки с проверкой ввода.
-    //
-    // char* stringToOutput - строка, которую нужно выводить
-    // ... в запросе ввода;
-    // bool(* pChecker)(char*) - указатель на функцию, проверяющую
-    // ... дополнительные условия.
     char* stringToReturn;
     bool init;
     init = true;
@@ -109,7 +110,7 @@ char* CycledCheckedInputString(bool(* additionalCheck)(char*))
         {
             return stringToReturn;
         }
-        if(!init)
+        if (!init)
         {
             printf("Input error!\n");
         }

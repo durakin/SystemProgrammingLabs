@@ -1,5 +1,6 @@
 /*! \file   input.h
- *  \brief  Header file of function to read integer with additional check
+ *  \brief  Header file of function to read integer and string with additional
+ *          check
  */
 
 #ifndef INPUT_H
@@ -9,8 +10,9 @@
 #include <stdio.h>
 #include <malloc.h>
 
+
 /*! \enum
- *  \brief  Size of string for input
+ *  \brief  Size of string for input and some chars' codes
  */
 enum inputConstants
 {
@@ -20,6 +22,15 @@ enum inputConstants
     END_CHAR_RANGE = 126
 };
 
+/*! \brief Reads string
+ *
+ *  \details Reads string with additional check. Continues reading until
+ *  correct value is read. Possible memory leak: returns a pointer to
+ *  allocated memory.
+ *
+ *  \param bool* Pointer to the function that checks additional condition.
+ *  \return char* read correct string.
+ */
 char* CycledCheckedInputString(bool(* additionalCheck)(char*));
 
 /*! \brief Reads int

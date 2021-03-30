@@ -1,9 +1,17 @@
+/*! \file   main.c
+ *  \brief  Main file with minimal console interface to work with list
+ *  according to task
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include "IslandGroup.h"
 #include "Input.h"
 
 
+/*! \enum
+ *  \brief  Operation code for main menu and every sub-menu
+ */
 enum OperationsCodes
 {
     ADD = 1,
@@ -22,16 +30,37 @@ enum OperationsCodes
     QUIT = 5
 };
 
+/*! \brief Checks if number can be a main menu operation codes
+ *
+ *  \param numberToCheck number to check.
+ *
+ *  \return true if number can be a main menu operation codes
+ *  false - otherwise
+ */
 bool MainMenuInputCheck(int operationCode)
 {
     return operationCode >= ADD && operationCode <= QUIT;
 }
 
+/*! \brief Checks if number can be a print menu operation codes
+ *
+ *  \param numberToCheck number to check.
+ *
+ *  \return true if number can be a print menu operation codes
+ *  false - otherwise
+ */
 bool PrintMenuInputCheck(int operationCode)
 {
     return operationCode >= PRINT_BY_NAME && operationCode <= PRINT_BACK;
 }
 
+/*! \brief Checks if number can be a modify menu operation codes
+ *
+ *  \param numberToCheck number to check.
+ *
+ *  \return true if number can be a modify menu operation codes
+ *  false - otherwise
+ */
 bool ModifyMenuInputCheck(int operationCode)
 {
     return operationCode >= MODIFY_NAME &&
@@ -99,8 +128,7 @@ int main()
                     char* name;
                     printf("Enter required group's name\n");
                     name = CycledCheckedInputString(IslandGroupNameCheck);
-                    PrintIslandGroupLink(
-                            FindIslandGroupLinkByName(objectList, name));
+                    PrintIslandGroup(objectList, name);
                     free(name);
                 }
                 if (subOperationCode == PRINT_BY_ISLANDS)
@@ -109,11 +137,7 @@ int main()
                     printf("Enter required number of islands\n");
                     requiredIslands = CycledCheckedInputInt(
                             IslandsNumberCheck);
-                    ListLink* tempSubList;
-                    tempSubList = ListLinkIslandGroupsByIslands(objectList,
-                                                                requiredIslands);
-                    PrintAllIslandGroups(tempSubList);
-                    ListLinkFree(tempSubList, (void*) FreeIslandGroup);
+                    PrintIslandGroupsByIslands(objectList, requiredIslands);
                 }
                 if (subOperationCode == PRINT_IF_ANY_UNINHABITED)
                 {
@@ -143,7 +167,7 @@ int main()
             printf("Enter name of the group to delete\n");
             name = CycledCheckedInputString(IslandGroupNameCheck);
 
-            if (DeleteIslandGroupByName_proper(&objectList, name) == 0)
+            if (DeleteIslandGroup(&objectList, name) == 0)
             {
                 printf("Deleted!");
             }
@@ -169,9 +193,9 @@ int main()
                 char* newName;
                 printf("Enter new name for this island group\n");
                 newName = CycledCheckedInputString(IslandGroupNameCheck);
-                if ((ChangeIslandGroupName(
-                        FindIslandGroupLinkByName(objectList, originalName),
-                        newName)) == 0)
+
+                if (ChangeIslandGroupName(objectList, originalName,
+                                          newName) == 0)
                 {
                     printf("Name changed!");
                 }
@@ -190,9 +214,8 @@ int main()
                 int newIslands;
                 printf("Enter new overall number of islands in group\n");
                 newIslands = CycledCheckedInputInt(IslandsNumberCheck);
-                if (ChangeIslandGroupIslands(
-                        FindIslandGroupLinkByName(objectList, name),
-                        newIslands) == 0)
+                if (ChangeIslandGroupIslands(objectList, name,
+                                             newIslands) == 0)
                 {
                     printf("Number of islands changed!\n");
                 }
@@ -207,13 +230,12 @@ int main()
                 char* name;
                 printf("Enter required group's name\n");
                 name = CycledCheckedInputString(IslandGroupNameCheck);
-                int newInhabitedIslands;
+                int newInhIslands;
                 printf("Enter new number of inhabited islands in group\n");
-                newInhabitedIslands = CycledCheckedInputInt(
+                newInhIslands = CycledCheckedInputInt(
                         InhabitedIslandsNumberCheck);
-                if (ChangeInhabitedIslandGroupIslands(
-                        FindIslandGroupLinkByName(objectList, name),
-                        newInhabitedIslands) == 0)
+                if (ChangeIslandGroupInhIslands(objectList, name,
+                                                newInhIslands) == 0)
                 {
                     printf("Number of inhabited islands changed!\n");
                 }
