@@ -31,22 +31,6 @@ ListLink* ListLinkTail(ListLink* objectList)
     return position;
 }
 
-/*ListLink* ListLinkFindByCondition(ListLink* objectList,
-                                  bool(* condition)(void*))
-{
-    ListLink* position;
-    position = ListLinkHead(objectList);
-    while (position != NULL)
-    {
-        if (condition(position))
-        {
-            break;
-        }
-        position = position->next;
-    }
-    return position;
-}*/
-
 void ListLinkSearchFromHead(ListLink* objectList, void* (* action)(void*))
 {
     ListLink* position;
@@ -92,53 +76,6 @@ ListLink* ListLinkDelete(ListLink* linkToDelete, void* (* freeContent)(void*))
     freeContent(linkToDelete->content);
     free(linkToDelete);
     return linkToReturn;
-}
-
-void ListLinkSwap(ListLink* firstLink, ListLink* secondLink)
-{
-    void* contentBox;
-    contentBox = firstLink->content;
-    firstLink->content = secondLink->content;
-    secondLink->content = contentBox;
-}
-
-int ListLinkSize(ListLink* objectList)
-{
-    ListLink* position;
-    if (objectList == NULL)
-    {
-        return 0;
-    }
-    position = ListLinkHead(objectList);
-    int size;
-    size = 1;
-    while (position->next != NULL)
-    {
-        size++;
-        position = position->next;
-    }
-    return size;
-}
-
-void ListLinkBubbleSort(ListLink* objectList,
-                        bool(* comparator)(void*, void*))
-{
-    ListLink* position;
-    position = NULL;
-    ListLink* index;
-    index = NULL;
-    for (position = ListLinkHead(objectList);
-         position->next != NULL; position = position->next)
-    {
-        for (index = position->next;
-             index != NULL; index = index->next)
-        {
-            if (comparator(index->content, position->content))
-            {
-                ListLinkSwap(position, index);
-            }
-        }
-    }
 }
 
 void ListLinkFree(ListLink* objectList, void* (* freeContent)(void*))

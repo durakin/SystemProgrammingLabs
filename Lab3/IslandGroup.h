@@ -1,6 +1,7 @@
 #ifndef ISLANDGROUP_H
 #define ISLANDGROUP_H
 
+#include <string.h>
 #include "LinkedList.h"
 
 
@@ -26,13 +27,20 @@ ListLink* FindIslandGroupLinkByName(ListLink* objectList, char* name);
 ListLink* AddIslandGroup(ListLink* objectList, char* name, int islands,
                          int inhabitedIslands);
 
-int DeleteIslandGroupByName(ListLink** objectList, char* name);
+int DeleteIslandGroupByName_proper(ListLink** objectList, char* name);
 
 int ChangeIslandGroupName(ListLink* objectLink, char* newName);
 
 int ChangeIslandGroupIslands(ListLink* objectLink, int newIslands);
 
-int ChangeInhabitedIslandGroupIslands(ListLink* objectLink, int newInhabitedIsland);
+int ChangeInhabitedIslandGroupIslands(ListLink* objectLink,
+                                      int newInhabitedIsland);
+
+bool IslandGroupNameCheck(char* nameToCheck);
+
+bool IslandsNumberCheck(int numberToCheck);
+
+bool InhabitedIslandsNumberCheck(int numberToCheck);
 
 
 #endif //ISLANDGROUP_H

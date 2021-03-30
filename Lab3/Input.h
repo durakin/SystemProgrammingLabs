@@ -7,15 +7,20 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-
+#include <malloc.h>
 
 /*! \enum
  *  \brief  Size of string for input
  */
-enum sizes
+enum inputConstants
 {
-    INPUT_SIZE = 200
+    INPUT_SIZE = 200,
+    BACKSPACE_KEY = 8,
+    START_CHAR_RANGE = 32,
+    END_CHAR_RANGE = 126
 };
+
+char* CycledCheckedInputString(bool(* additionalCheck)(char*));
 
 /*! \brief Reads int
  *
@@ -25,7 +30,7 @@ enum sizes
  *  \param bool* Pointer to the function that checks additional condition.
  *  \return Integer read correct integer.
  */
-int checkedInputInt(bool(* additionalCheck)(int));
+int CycledCheckedInputInt(bool(* additionalCheck)(int));
 
 
 #endif //INPUT_H
