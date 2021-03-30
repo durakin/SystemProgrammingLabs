@@ -58,8 +58,8 @@ ListLink* ListLinkAdd(ListLink* objectList, void* content);
 
 /*! \brief Deletes element of linked list by pointer
  *
- * \details Calls freeContent() of link to delete for freeing a content, then
- * frees link itself.
+ *  \details Calls freeContent() of link to delete for freeing a content, then
+ *  frees link itself.
  *
  *  \param linkToDelete Pointer to the link to delete
  *  \param freeContent Function to free content of linked list
@@ -71,7 +71,7 @@ ListLinkDelete(ListLink* linkToDelete, void* (* freeContent)(void*));
 
 /*! \brief Delete list link and free memory
  *
- * \details Calls ListLinkDelete() of every link of linked list
+ *  \details Calls ListLinkDelete() of every link of linked list
  *
  *  \param linkToDelete Pointer to the link to delete
  *  \param freeContent Function to free content of linked list

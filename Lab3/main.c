@@ -106,7 +106,8 @@ int main()
             }
             else
             {
-                printf("There is a conflict in islands numbers or group with such name already exists. None added\n");
+                printf("There is a conflict in islands numbers or group"
+                       "with such name already exists. None added\n");
             }
             continue;
         }
@@ -118,7 +119,8 @@ int main()
             {
                 printf("\n1. Print group by name."
                        "\n2. Print group by islands number."
-                       "\n3. Check if any island group is totally uninhabited."
+                       "\n3. Check if any island group is totally"
+                       "uninhabited."
                        "\n4. Print all island group."
                        "\n5. Back."
                        "\n");
@@ -143,11 +145,13 @@ int main()
                 {
                     if (AnyUnInhabitedIslandGroups(objectList))
                     {
-                        printf("Found at least one totally uninhabited island group\n");
+                        printf("Found at least one totally uninhabited"
+                               "island group\n");
                     }
                     else
                     {
-                        printf("There is no any uninhabited island groups\n");
+                        printf("There is no any uninhabited island"
+                               "groups\n");
 
                     }
                 }
@@ -202,7 +206,8 @@ int main()
                 }
                 else
                 {
-                    printf("Either new name is taken, or there is no island group with such name");
+                    printf("Either new name is taken, or there is no"
+                           "island group with such name");
                     free(newName);
                 }
                 free(originalName);
@@ -242,7 +247,9 @@ int main()
                 }
                 else
                 {
-                    printf("Either there is no such island or number of inhabited islands is bigger than overall number of islands\n");
+                    printf("Either there is no such island or number of"
+                           "inhabited islands is bigger than overall number"
+                           "of islands\n");
                 }
                 free(name);
             }
@@ -252,5 +259,6 @@ int main()
             break;
         }
     }
+    ListLinkFree(objectList, (void*) FreeIslandGroup);
     return 0;
 }
