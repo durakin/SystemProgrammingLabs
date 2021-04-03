@@ -50,6 +50,11 @@ ListLink* ListLinkAdd(ListLink* objectList, void* content)
 {
     ListLink* linkToAdd;
     linkToAdd = (ListLink*) malloc(sizeof(ListLink));
+    if (linkToAdd == NULL)
+    {
+        perror("Couldn't allocate memory!");
+        return NULL;
+    }
     linkToAdd->next = NULL;
     linkToAdd->previous = ListLinkTail(objectList);
     linkToAdd->content = content;

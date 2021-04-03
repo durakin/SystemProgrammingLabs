@@ -90,7 +90,7 @@ char* StrDynInput()
         }
         else
         {
-            printf("Couldn't allocate memory!");
+            perror("Couldn't allocate memory!");
             break;
         }
     }
