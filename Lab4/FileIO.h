@@ -39,6 +39,7 @@ int writeInfo(int fd, void* info, size_t size);
  *  \return Nothing
  */
 int writeMeta(int fd, int32_t inputSize);
+
 /*! \brief Reads information from the file. Similar to the function read() from <unistd.h>
  * but also outputs errors
  *
@@ -49,6 +50,7 @@ int writeMeta(int fd, int32_t inputSize);
  *  \return -1 if something went wrong. Else the number of bytes that have been successfully read from file
  */
 int readInfo(int fd, void* info, size_t size);
+
 /*! \brief Reads meta information (size of one group) from the file
  *
  * \param fd File descriptor
@@ -64,10 +66,12 @@ int readMeta(int fd, int* inputSize);
  *  \return Nothing
  */
 
-int addIslandGroup(int fd, char* islandGroupName, int32_t islandGroupIslands, int32_t islandGroupInhabitantIslands, int inputSize);
+int addIslandGroup(int fd, char* islandGroupName, int32_t islandGroupIslands,
+                   int32_t islandGroupInhabitantIslands, int inputSize);
 
 
 int deleteFile(char* filename);
+
 /*! \brief Deletes information about one group from the file. The group is identified by name
  *
  * \param fd File descriptor
@@ -107,6 +111,7 @@ int changeIslandGroupName(int fd, char* name, char* newName, int inputSize);
  */
 int changeIslandGroupIslands(int fd, char* name, int islandGroupIslands,
                              int inputSize);
+
 /*! \brief Changes the females number of one group in the file
  *
  * \param fd File descriptor
@@ -142,7 +147,8 @@ bool isAnyUninhabitant(int fd, int inputSize);
 // ⠨⡂⡀⢑⢕⡅⠂⠄⠉⠛⠻⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢋⢔⢕⢕⣿⣿⠠⠈
 // ⠄⠪⣂⠁⢕⠆⠄⠂⠄⠁⡀⠂⡀⠄⢈⠉⢍⢛⢛⢛⢋⢔⢕⢕⢕⣽⣿⣿⠠⠈
 
-int prepareFile(int* fd, char* filename, int* inputSize);
+int prepareNewFile(int* fd, char* filename, int inputSize);
 
+int openFile(int* fd, char* filename, int* inputSize);
 
 #endif //FILEIO_H

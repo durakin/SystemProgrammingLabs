@@ -11,7 +11,8 @@
 
 enum sizes
 {
-    INPUT_SIZE = 64
+    INPUT_SIZE = 64,
+    MAX_INPUT_SIZE = 64
 };
 
 /*! \brief Reads int

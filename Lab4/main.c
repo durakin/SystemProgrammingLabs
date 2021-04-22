@@ -20,7 +20,10 @@ enum OperationsCodes
     MODIFY_ISLANDS = 2,
     MODIFY_UNINHABITED_ISLANDS = 3,
     MODIFY_BACK = 4,
-    QUIT = 5
+    CHANGE_FILE = 5,
+    CHANGE_FILE_EXISTING = 1,
+    CHANGE_FILE_NEW = 2,
+    QUIT = 6
 };
 
 /*! \brief Checks if number can be a main menu operation codes
@@ -45,6 +48,12 @@ bool MainMenuInputCheck(int operationCode)
 bool PrintMenuInputCheck(int operationCode)
 {
     return operationCode >= PRINT_BY_NAME && operationCode <= PRINT_BACK;
+}
+
+bool ChangeFileMenuInputCheck(int operationCode)
+{
+    return operationCode >= CHANGE_FILE_EXISTING &&
+           operationCode <= CHANGE_FILE_NEW;
 }
 
 /*! \brief Checks if number can be a modify menu operation codes
@@ -88,20 +97,11 @@ bool inhabitedIslandsNumberCheck(int numberToCheck)
 int main()
 {
     int fd;
-    char* filename;
-    int inputSize;
-    //inputSize = INPUT_SIZE;
-    printf("Enter name for save file\n");
-    filename = (char*) malloc(INPUT_SIZE * sizeof(char));
-    checkedInputString(filename, nameInputCheck, INPUT_SIZE);
 
-    if (prepareFile(&fd, filename, &inputSize) != 0)
-    {
-        printf("Couldn't open file or create new one");
-        return -1;
-    }
+    int inputSize;
 
     int operationCode;
+
     while (true)
     {
         int subOperationCode;
@@ -109,7 +109,8 @@ int main()
                "2. Print data.\n"
                "3. Delete data.\n"
                "4. Modify data.\n"
-               "5. Quit.\n");
+               "5. Change save file.\n"
+               "6. Quit.\n");
         operationCode = checkedInputInt(MainMenuInputCheck);
 
         if (operationCode == ADD)
@@ -125,7 +126,8 @@ int main()
             printf("Enter number of inhabited islands in group\n");
             inhabitedIslands = checkedInputInt(
                     inhabitedIslandsNumberCheck);
-            if (addIslandGroup(fd, name, islands, inhabitedIslands, inputSize) == 0)
+            if (addIslandGroup(fd, name, islands, inhabitedIslands,
+                               inputSize) == 0)
             {
                 printf("Added!\n");
             }
@@ -154,7 +156,7 @@ int main()
                 if (subOperationCode == PRINT_BY_NAME)
                 {
                     char* name;
-                    name = (char*) malloc(inputSize*sizeof(char));
+                    name = (char*) malloc(inputSize * sizeof(char));
                     printf("Enter required group's name\n");
                     checkedInputString(name, nameInputCheck, inputSize);
                     printIslandGroupByName(fd, name, inputSize);
@@ -287,6 +289,38 @@ int main()
             }
         }
          */
+        if (operationCode == CHANGE_FILE)
+        {
+            while (true)
+            {
+                printf("\n1. Load existing file."
+                       "\n2. Create new file."
+                       "\n");
+                subOperationCode = checkedInputInt(PrintMenuInputCheck);
+                if (subOperationCode == CHANGE_FILE_EXISTING)
+                {
+                    printf("Enter name for save file\n");
+                    char filename[MAX_INPUT_SIZE];
+                    checkedInputString(filename, nameInputCheck, MAX_INPUT_SIZE);
+                    if (openFile(&fd, filename, &inputSize) != 0)
+                    {
+                        printf("Couldn't load this file.\n");
+                        break;
+                    }
+                }
+                if (subOperationCode == CHANGE_FILE_NEW)
+                {
+                    printf("Enter name for new save file. Warning: if such file exists - it will be overwritten\n");
+                    char filename[MAX_INPUT_SIZE];
+                    checkedInputString(filename, nameInputCheck, MAX_INPUT_SIZE);
+                    if (prepareNewFile(&fd, filename, INPUT_SIZE) != 0)
+                    {
+                        printf("Couldn't create new save file.\n");
+                    }
+                }
+            }
+        }
+
         if (operationCode == QUIT)
         {
             break;
