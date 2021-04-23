@@ -400,7 +400,10 @@ int main()
 
         if (operationCode == QUIT)
         {
-            close(fd);
+            if (loaded)
+            {
+                close(fd);
+            }
             break;
         }
     }
