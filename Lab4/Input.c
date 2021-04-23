@@ -1,14 +1,15 @@
-//
-// Created by Albert Nepomnyashiy on 4/15/2021.
-//
+/*! \file   Input.c
+ *  \brief  Implements functions of Input.h and functions required  by them
+ */
 
 #include "Input.h"
 #include "malloc.h"
 
+
 int checkedInputInt(bool(* additionalCheck)(int))
 {
     int result;
-    char inputString[INPUT_SIZE];
+    char inputString[MAX_INPUT_SIZE];
 
     while (true)
     {
@@ -29,19 +30,18 @@ int checkedInputInt(bool(* additionalCheck)(int))
 }
 
 
-void checkedInputString(char* destination, bool(* additionalCheck)(char*), int inputSize)
+void checkedInputString(char* destination, bool(* additionalCheck)(char*),
+                        int inputSize)
 {
-    char* input;
+    char input[MAX_INPUT_SIZE];
     while (true)
     {
-        input = (char*) malloc(inputSize * sizeof(char));
         scanf("%s", input);
-        if (additionalCheck(input))
+        if (additionalCheck(input) && strlen(input) <= inputSize)
         {
             break;
         }
         printf("Wrong format!\n");
-        free(input);
     }
     strcpy(destination, input);
 }

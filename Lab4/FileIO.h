@@ -1,154 +1,150 @@
+/*! \file   FileIO.h
+ *  \brief  Header file of functions working with files keeping info of
+ *  island groups.
+ */
+
 #ifndef FILEIO_H
 #define FILEIO_H
-
 #include <inttypes.h>
-#include <unistd.h>
 #include <stdbool.h>
 
-/*! \brief Checks whether the file from the path exists or not.
- *
- * \param path Path to the file. The file can be local
- *
- *  \return 0 if exists else -1
- */
-bool fileExistCheck(char* path);
 
-/*! \brief Calculates the file size
+/*! \brief Checks consistence of information and uniqueness of island group's
+ *  name and saves it to file
  *
- * \param fd File descriptor
+ *  \param fd                     File descriptor
+ *  \param islandGroupName        Name of island group
+ *  \param islandGroupIslands     Overall number of islands in group
+ *  \param islandGroupInhIslands  Number of inhabitant islands in group
+ *  \param inputSize              Maximal size of island groups' name
  *
- *  \return File size
+ *  \return 0 on success, -1 otherwise
  */
-int getFileSize(int fd);
-
-/*! \brief Writes information in bytes from buffer into file. Similar to the function write() from <unistd.h>
- * but also outputs errors
- *
- * \param fd File descriptor
- * \param info Variable with information that will be loaded into file
- * \param size The number of bytes that will be loaded into file
- *
- *  \return -1 if something went wrong. Else the number of bytes that have been successfully loaded into file
- */
-int writeInfo(int fd, void* info, size_t size);
-
-/*! \brief Writes meta information (size of one group) into beginning of the file (if the file is empty)
- *
- * \param fd File descriptor
- *
- *  \return Nothing
- */
-int writeMeta(int fd, int32_t inputSize);
-
-/*! \brief Reads information from the file. Similar to the function read() from <unistd.h>
- * but also outputs errors
- *
- * \param fd File descriptor
- * \param info Variable with information that will be loaded into file
- * \param size The number of bytes that will be loaded into file
- *
- *  \return -1 if something went wrong. Else the number of bytes that have been successfully read from file
- */
-int readInfo(int fd, void* info, size_t size);
-
-/*! \brief Reads meta information (size of one group) from the file
- *
- * \param fd File descriptor
- *
- *  \return Nothing
- */
-int readMeta(int fd, int* inputSize);
-
-/*! \brief Deletes the file from the working directory
- *
- * \param filename The name of file
- *
- *  \return Nothing
- */
-
 int addIslandGroup(int fd, char* islandGroupName, int32_t islandGroupIslands,
                    int32_t islandGroupInhabitantIslands, int inputSize);
 
-
-int deleteFile(char* filename);
-
-/*! \brief Deletes information about one group from the file. The group is identified by name
+/*! \brief Deletes island group from list by name
  *
- * \param fd File descriptor
- * \param groupName The name of a group
+ *  \details Copies file content into new file, skipping island group to
+ *  delete, renames it, and deletes old file.
  *
- *  \return Is there such a group (0) or not (-1)
+ *  \param fd               Pointer to file descriptor
+ *  \param islandGroupName  Name of island group to delete
+ *  \param filename         Name of save file
+ *  \param inputSize        Maximal size of island groups' name
+ *
+ *  \return true if something was deleted, false otherwise
  */
-int deleteGroupByName(int fd, char* islandGroupName, char* filename,
-                      int inputSize);
-
-/*! \brief Moves the pointer in the file to one group
- *
- * \param fd File descriptor
- * \param groupName The name of a group
- *
- *  \return Is there such a group (0) or not (-1)
- */
-int seekToGroupByName(int fd, char* groupName, int inputSize);
+bool deleteGroupByName(int* fd, char* islandGroupName, char* filename,
+                       int inputSize);
 
 /*! \brief Changes the name of one group in the file
  *
- * \param fd File descriptor
- * \param name The name of a group where a new name will be
- * \param newName A new name of the group
+ *  \param fd         File descriptor
+ *  \param name       Name of the group to rename
+ *  \param newName    New name of the group
+ *  \param inputSize  Maximal size of island groups' name
  *
- *  \return Is there such a group (0) or not (-1)
+ *  \return 0 if group was found, -1 otherwise
  */
 int changeIslandGroupName(int fd, char* name, char* newName, int inputSize);
 
-/*! \brief Changes the students number of one group in the file
+/*! \brief Changes overall number of islands in group by name
  *
- * \param fd File descriptor
- * \param name The name of a group where a new students number will be
- * \param newStudentsNumber A new students number of the group
+ *  \details If new overall number of island groups is smaller than old
+ *  inhabitant - also changes number of inhabitant to new overall number
+ *  of islands.
  *
- *  \return Is there such a group (0) or not (-1)
+ *  \param fd                  File descriptor
+ *  \param name                Name of the group to change islands number
+ *  \param islandGroupIslands  New number of islands
+ *  \param inputSize           Maximal  size of island groups' name
+ *
+ *  \return 0 if island group was found and changed, -1 otherwise
  */
 int changeIslandGroupIslands(int fd, char* name, int islandGroupIslands,
                              int inputSize);
 
-/*! \brief Changes the females number of one group in the file
+/*! \brief Changes number of inhabitant islands in group by name
  *
- * \param fd File descriptor
- * \param groupName The name of a group where a new females number will be
- * \param newFemalesNumber A new females number of the group
+ *  \details If new number of inhabitant islands in group is smaller than old
+ *  overall number of islands - doesn't change anything.
  *
- *  \return Is there such a group (0) or not (-1)
+ *  \param fd                     File descriptor
+ *  \param name                   Name of the group to change islands number
+ *  \param islandGroupInhIslands  New number of inhabitant islands
+ *  \param inputSize              Maximal  size of island groups' name
+ *
+ *  \return 0 if island group was found and changed, -1 otherwise
  */
 int changeIslandGroupInhabitantIslands(int fd, char* name,
-                                       int islandGroupInhabitantIslands,
+                                       int islandGroupInhIslands,
                                        int inputSize);
 
-void printIslandGroup(int fd, int inputSize);
-
+/*! \brief Prints island group, by name
+ *
+ *  \param fd         File descriptor
+ *  \param char       Name of group to print
+ *  \param inputSize  Maximal  size of island groups' name
+ */
 void printIslandGroupByName(int fd, char* name, int inputSize);
 
-void printAllIslandGroup(int fd, int inputSize);
+/*! \brief Prints island groups, by number of islands
+ *
+ *  \details Creates temp list of suitable islands, prints it and deletes
+ *
+ *  \param fd         File descriptor
+ *  \param islands    Required number of islands
+ *  \param inputSize  Maximal  size of island groups' name
+ */
+void printIslandGroupsByIslands(int fd, int islands, int inputSize);
 
-bool isAnyUninhabitant(int fd, int inputSize);
+/*! \brief Prints island groups, by number of islands
+ *
+ *  \details Creates temp list of suitable islands, prints it and deletes
+ *
+ *  \param fd         File descriptor
+ *  \param islands    Required number of islands
+ *  \param inputSize  Maximal  size of island groups' name
+ */
+void printAllIslandGroups(int fd, int inputSize);
 
-// ⣿⣿⣷⡁⢆⠈⠕⢕⢂⢕⢂⢕⢂⢔⢂⢕⢄⠂⣂⠂⠆⢂⢕⢂⢕⢂⢕⢂⢕⢂
-// ⣿⣿⣿⡷⠊⡢⡹⣦⡑⢂⢕⢂⢕⢂⢕⢂⠕⠔⠌⠝⠛⠶⠶⢶⣦⣄⢂⢕⢂⢕
-// ⣿⣿⠏⣠⣾⣦⡐⢌⢿⣷⣦⣅⡑⠕⠡⠐⢿⠿⣛⠟⠛⠛⠛⠛⠡⢷⡈⢂⢕⢂
-// ⠟⣡⣾⣿⣿⣿⣿⣦⣑⠝⢿⣿⣿⣿⣿⣿⡵⢁⣤⣶⣶⣿⢿⢿⢿⡟⢻⣤⢑⢂
-// ⣾⣿⣿⡿⢟⣛⣻⣿⣿⣿⣦⣬⣙⣻⣿⣿⣷⣿⣿⢟⢝⢕⢕⢕⢕⢽⣿⣿⣷⣔
-// ⣿⣿⠵⠚⠉⢀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣗⢕⢕⢕⢕⢕⢕⣽⣿⣿⣿⣿
-// ⢷⣂⣠⣴⣾⡿⡿⡻⡻⣿⣿⣴⣿⣿⣿⣿⣿⣿⣷⣵⣵⣵⣷⣿⣿⣿⣿⣿⣿⡿
-// ⢌⠻⣿⡿⡫⡪⡪⡪⡪⣺⣿⣿⣿⣿⣿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃
-// ⠣⡁⠹⡪⡪⡪⡪⣪⣾⣿⣿⣿⣿⠋⠐⢉⢍⢄⢌⠻⣿⣿⣿⣿⣿⣿⣿⣿⠏⠈
-// ⡣⡘⢄⠙⣾⣾⣾⣿⣿⣿⣿⣿⣿⡀⢐⢕⢕⢕⢕⢕⡘⣿⣿⣿⣿⣿⣿⠏⠠⠈
-// ⠌⢊⢂⢣⠹⣿⣿⣿⣿⣿⣿⣿⣿⣧⢐⢕⢕⢕⢕⢕⢅⣿⣿⣿⣿⡿⢋⢜⠠⠈
-// ⠄⠁⠕⢝⡢⠈⠻⣿⣿⣿⣿⣿⣿⣿⣷⣕⣑⣑⣑⣵⣿⣿⣿⡿⢋⢔⢕⣿⠠⠈
-// ⠨⡂⡀⢑⢕⡅⠂⠄⠉⠛⠻⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢋⢔⢕⢕⣿⣿⠠⠈
-// ⠄⠪⣂⠁⢕⠆⠄⠂⠄⠁⡀⠂⡀⠄⢈⠉⢍⢛⢛⢛⢋⢔⢕⢕⢕⣽⣿⣿⠠⠈
+/*! \brief Checks if any island group in file hasn't any inhabitant island
+ *
+ *  \param fd         File descriptor
+ *  \param inputSize  Maximal  size of island groups' name
+ *
+ *  \return true if any island group in file hasn't any inhabitant island,
+ *  false otherwise
+ */
+bool isAnyUninhabited(int fd, int inputSize);
 
+/*! \brief Prepares new file for saving island groups info
+ *
+ *  \details Creates file with name filename, opens it putting descriptor
+ *  into *fd by pointer, puts meta into this file.
+ *
+ *  \param fd         Pointer to file descriptor
+ *  \param filename   Mame of save file
+ *  \param inputSize  Maximal size of island groups' name
+ *
+ *  \return 0 on success, -1 otherwise.
+ */
 int prepareNewFile(int* fd, char* filename, int inputSize);
 
+/*! \brief Opens file and reads meta
+ *
+ *  \details Opens file with name filename, putting descriptor
+ *  into *fd by pointer, reads meta into this file putting it into *inputSize.
+ *  Doesn't provide any check of data in file.
+ *
+ *  \param fd         Pointer to file descriptor
+ *  \param filename   Mame of save file
+ *  \param inputSize  Pointer to put maximal size of island groups' name
+ *
+ *  \return 0 on success, -1 otherwise.
+ */
 int openFile(int* fd, char* filename, int* inputSize);
+
 
 #endif //FILEIO_H

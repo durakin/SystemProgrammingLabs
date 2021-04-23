@@ -1,6 +1,7 @@
-//
-// Created by Albert Nepomnyashiy on 4/15/2021.
-//
+/*! \file   Input.h
+ *  \brief  Header file of function to read integer and string with additional
+ *          check
+ */
 
 #ifndef INPUT_H
 #define INPUT_H
@@ -9,9 +10,12 @@
 #include <stdio.h>
 #include <string.h>
 
+
+/*! \enum
+ *  \brief  Sizes of strings for input and output
+ */
 enum sizes
 {
-    INPUT_SIZE = 64,
     MAX_INPUT_SIZE = 64
 };
 
@@ -20,12 +24,23 @@ enum sizes
  *  \details Reads int with additional check. Continues reading until
  *  correct value is read.
  *
- *  \param bool* Pointer to the function that checks additional condition.
- *  \return Integer read correct integer.
+ *  \param bool* Pointer to the function that checks additional condition
+ *
+ *  \return Integer read correct integer
  */
 int checkedInputInt(bool(* additionalCheck)(int));
 
-void checkedInputString(char* destination, bool(* additionalCheck)(char*), int inputSize);
+/*! \brief Reads string
+ *
+ *  \details Reads string with additional check. Continues reading until
+ *  correct value is read.
+ *
+ *  \param destination  Pointer to buffer for saving read string
+ *  \param bool*        Pointer to the additional check function
+ *  \param inputSize    Maximal size of read string
+ */
+void checkedInputString(char* destination, bool(* additionalCheck)(char*),
+                        int inputSize);
 
 
 #endif //INPUT_H

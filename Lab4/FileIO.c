@@ -1,3 +1,8 @@
+/*! \file   FileIO.c
+ *  \brief  Implements functions declared in FileIO.c and defines other
+ *  functions essential for this.
+ */
+
 #include <stdbool.h>
 #include "FileIO.h"
 #include <inttypes.h>
@@ -8,23 +13,26 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "Input.h"
-/*! \brief Checks whether the file from the path exists or not.
+
+
+#define TEMP_FILE_NAME "_temp"
+
+/*! \brief Checks whether the file from the path exists or not
  *
- * \param path Path to the file. The file can be local
+ *  \param path Path to the file
  *
- *  \return 0 if exists else -1
+ *  \return true if exists, false otherwise
  */
 bool fileExistCheck(char* path)
 {
     return (access(path, F_OK) == 0);
 }
 
-
-/*! \brief Calculates the file size
+/*! \brief Returns size of file
  *
- * \param fd File descriptor
+ *  \param fd File descriptor
  *
- *  \return File size
+ *  \return Size of file
  */
 int getFileSize(int fd)
 {
@@ -34,18 +42,33 @@ int getFileSize(int fd)
     {
         perror("Getting file info went wrong.");
     }
-    printf("DEBUG Filesize is %d", (int) info.st_size);
     return (int) info.st_size;
 }
 
-/*! \brief Writes information in bytes from buffer into file. Similar to the function write() from <unistd.h>
- * but also outputs errors
+/*! \brief Deletes file from working directory by name
  *
- * \param fd File descriptor
- * \param info Variable with information that will be loaded into file
- * \param size The number of bytes that will be loaded into file
+ *  \param filename Name of file
  *
- *  \return -1 if something went wrong. Else the number of bytes that have been successfully loaded into file
+ *  \return 0 on success, -1 otherwise
+ */
+int deleteFile(char* filename)
+{
+    int removeReturn = remove(filename);
+    if (removeReturn != 0)
+    {
+        perror("File delete error");
+        return -1;
+    }
+    return 0;
+}
+
+/*! \brief Writes info from buffer by pointer into file
+ *
+ *  \param fd    File descriptor
+ *  \param info  Variable with information that will be loaded into file
+ *  \param size  The number of bytes that will be loaded into file
+ *
+ *  \return 0 on success, -1 otherwise
  */
 int writeInfo(int fd, void* info, size_t size)
 {
@@ -61,15 +84,16 @@ int writeInfo(int fd, void* info, size_t size)
         perror("Nothing was written.");
         return -1;
     }
-    printf("DEBUG Written");
     return 0;
 }
 
-/*! \brief Writes meta information (size of one group) into beginning of the file (if the file is empty)
+/*! \brief Writes meta information (maximal size of island groups' name)
+ *  into beginning of the file (if the file is empty)
  *
- * \param fd File descriptor
+ *  \param fd         File descriptor
+ *  \param inputSize  Meta information (maximal size of island groups' name)
  *
- *  \return Nothing
+ *  \return 0 on success, -1 otherwise
  */
 int writeMeta(int fd, int32_t inputSize)
 {
@@ -81,14 +105,13 @@ int writeMeta(int fd, int32_t inputSize)
     return -1;
 }
 
-/*! \brief Reads information from the file. Similar to the function read() from <unistd.h>
- * but also outputs errors
+/*! \brief Reads information from the file
  *
- * \param fd File descriptor
- * \param info Variable with information that will be loaded into file
- * \param size The number of bytes that will be loaded into file
+ *  \param fd    File descriptor
+ *  \param info  Variable with information that will be loaded into file
+ *  \param size  The number of bytes that will be loaded into file
  *
- *  \return -1 if something went wrong. Else the number of bytes that have been successfully read from file
+ *  \return 0 on success, -1 otherwise
  */
 int readInfo(int fd, void* info, size_t size)
 {
@@ -111,9 +134,9 @@ int readInfo(int fd, void* info, size_t size)
 
 /*! \brief Reads meta information (size of one group) from the file
  *
- * \param fd File descriptor
+ *  \param fd File descriptor
  *
- *  \return Nothing
+ *  \return 0 on success, -1 otherwise
  */
 int readMeta(int fd, int* inputSize)
 {
@@ -128,106 +151,13 @@ int readMeta(int fd, int* inputSize)
     return 0;
 }
 
-/*! \brief Deletes the file from the working directory
+/*! \brief Moves the pointer in the file to group by name
  *
- * \param filename The name of file
+ *  \param fd         File descriptor
+ *  \param groupName  Name of the group to seek
+ *  \param inputSize  Maximal size of island groups' name
  *
- *  \return Nothing
- */
-int deleteFile(char* filename)
-{
-    int removeReturn = remove(filename);
-    if (removeReturn != 0)
-    {
-        perror("File delete error");
-        return -1;
-    }
-    return 0;
-}
-
-/*! \brief Deletes information about one group from the file. The group is identified by name
- *
- * \param fd File descriptor
- * \param groupName The name of a group
- *
- *  \return Is there such a group (0) or not (-1)
- */
-
-void
-writeIslandGroup(int fd, char* islandGroupName, int32_t islandGroupIslands,
-                 int32_t islandGroupInhabitantIslands, int inputSize)
-{
-    lseek(fd, 0, SEEK_END);
-    writeInfo(fd, islandGroupName, sizeof(char) *
-                                   inputSize);
-    printf("DEBUG name written");
-    writeInfo(fd, (void*) &islandGroupIslands, sizeof(int32_t));
-    printf("DEBUG islands written");
-    writeInfo(fd, (void*) &islandGroupInhabitantIslands,
-              sizeof(int32_t));
-    printf("DEBUG inh islands written");
-}
-
-int addIslandGroup(int fd, char* islandGroupName, int32_t islandGroupIslands,
-                   int32_t islandGroupInhabitantIslands, int inputSize)
-{
-    if (islandGroupInhabitantIslands > islandGroupIslands ||
-        seekToGroupByName(fd, islandGroupName, inputSize) != -1)
-    {
-        return -1;
-    }
-    writeIslandGroup(fd, islandGroupName, islandGroupIslands,
-                     islandGroupInhabitantIslands, inputSize);
-    return 0;
-}
-
-int deleteGroupByName(int fd, char* islandGroupName, char* filename,
-                      int inputSize)
-{
-    int fdBox = open("new", O_CREAT | O_WRONLY);
-    writeMeta(fdBox, inputSize);
-
-    char* currentIslandGroupName = (char*) malloc(inputSize * sizeof(char));
-    int32_t currentIslandGroupIslands;
-    int32_t currentIslandGroupInhabitantIslands;
-    lseek(fd, sizeof(int32_t), SEEK_SET);
-
-    bool found = false;
-    while (lseek(fd, 0, SEEK_CUR) < getFileSize(fd))
-    {
-        readInfo(fd, currentIslandGroupName, sizeof(char) *
-                                             inputSize);
-        readInfo(fd, &currentIslandGroupIslands, sizeof(int32_t));
-        readInfo(fd, &currentIslandGroupInhabitantIslands, sizeof(int32_t));
-
-        if (strcmp(islandGroupName, currentIslandGroupName) == 0)
-        {
-            found = true;
-            continue;
-        }
-        writeIslandGroup(fdBox, currentIslandGroupName,
-                         currentIslandGroupIslands,
-                         currentIslandGroupInhabitantIslands, inputSize);
-    }
-
-    close(fd);
-    close(fdBox);
-
-    deleteFile(filename);
-    int renameReturn = rename("new", filename);
-    if (renameReturn != 0)
-    {
-        perror("Rename error");
-    }
-    return found;
-}
-
-/*! \brief Moves the pointer in the file to one group
- *
- * \param fd File descriptor
- * \param groupName The name of a group
- *
- *  \return Is there such a group (0) or not (-1)
+ *  \return 0 if group was found and seek set, -1 otherwise
  */
 int seekToGroupByName(int fd, char* groupName, int inputSize)
 {
@@ -250,14 +180,89 @@ int seekToGroupByName(int fd, char* groupName, int inputSize)
     return -1;
 }
 
-/*! \brief Changes the name of one group in the file
+
+/*! \brief Writes information about island group to the file.
  *
- * \param fd File descriptor
- * \param name The name of a group where a new name will be
- * \param newName A new name of the group
+ *  \details This function doesn't check if name is unique and information is
+ *  consistent. Should only be used as in addIslandGroup().
+ *  be called after additional
  *
- *  \return Is there such a group (0) or not (-1)
+ *  \param fd                     File descriptor
+ *  \param islandGroupName        Name of island group
+ *  \param islandGroupIslands     Overall number of islands in group
+ *  \param islandGroupInhIslands  Number of inhabitant islands in group
+ *  \param inputSize              Maximal size of island groups' name
  */
+void writeIslandGroup(int fd, char* islandGroupName,
+                      int32_t islandGroupIslands,
+                      int32_t islandGroupInhIslands,
+                      int inputSize)
+{
+    lseek(fd, 0, SEEK_END);
+    writeInfo(fd, islandGroupName, sizeof(char) * inputSize);
+    writeInfo(fd, (void*) &islandGroupIslands, sizeof(int32_t));
+    writeInfo(fd, (void*) &islandGroupInhIslands, sizeof(int32_t));
+}
+
+
+int addIslandGroup(int fd, char* islandGroupName, int32_t islandGroupIslands,
+                   int32_t islandGroupInhabitantIslands, int inputSize)
+{
+    if (islandGroupInhabitantIslands > islandGroupIslands ||
+        seekToGroupByName(fd, islandGroupName, inputSize) != -1)
+    {
+        return -1;
+    }
+    writeIslandGroup(fd, islandGroupName, islandGroupIslands,
+                     islandGroupInhabitantIslands, inputSize);
+    return 0;
+}
+
+bool deleteGroupByName(int* fd, char* islandGroupName, char* filename,
+                       int inputSize)
+{
+    int tempFd;
+    if (prepareNewFile(&tempFd, TEMP_FILE_NAME, inputSize) != 0)
+    {
+        printf("Something went wrong while creating temp file\n");
+        return false;
+    }
+    char stringInputBuffer[MAX_INPUT_SIZE];
+    int32_t currentIslandGroupIslands;
+    int32_t currentIslandGroupInhabitantIslands;
+    lseek(*fd, sizeof(int32_t), SEEK_SET);
+    bool found = false;
+    while (lseek(*fd, 0, SEEK_CUR) < getFileSize(*fd))
+    {
+        readInfo(*fd, stringInputBuffer, sizeof(char) *
+                                         inputSize);
+        readInfo(*fd, &currentIslandGroupIslands, sizeof(int32_t));
+        readInfo(*fd, &currentIslandGroupInhabitantIslands, sizeof(int32_t));
+
+        if (strcmp(islandGroupName, stringInputBuffer) == 0)
+        {
+            found = true;
+            continue;
+        }
+        char* currentIslandGroupName = (char*) malloc(
+                inputSize * sizeof(char));
+        strcpy(currentIslandGroupName, stringInputBuffer);
+        writeIslandGroup(tempFd, currentIslandGroupName,
+                         currentIslandGroupIslands,
+                         currentIslandGroupInhabitantIslands, inputSize);
+        free(currentIslandGroupName);
+    }
+    close(*fd);
+    *fd = tempFd;
+    deleteFile(filename);
+    int renameReturn = rename(TEMP_FILE_NAME, filename);
+    if (renameReturn != 0)
+    {
+        perror("Rename error");
+    }
+    return found;
+}
+
 int changeIslandGroupName(int fd, char* name, char* newName, int inputSize)
 {
     if (seekToGroupByName(fd, name, inputSize) != 0)
@@ -269,14 +274,6 @@ int changeIslandGroupName(int fd, char* name, char* newName, int inputSize)
     return 0;
 }
 
-/*! \brief Changes the students number of one group in the file
- *
- * \param fd File descriptor
- * \param name The name of a group where a new students number will be
- * \param newStudentsNumber A new students number of the group
- *
- *  \return Is there such a group (0) or not (-1)
- */
 int changeIslandGroupIslands(int fd, char* name, int islandGroupIslands,
                              int inputSize)
 {
@@ -286,51 +283,54 @@ int changeIslandGroupIslands(int fd, char* name, int islandGroupIslands,
     }
     lseek(fd, (int) sizeof(char) * inputSize, SEEK_CUR);
     writeInfo(fd, &islandGroupIslands, sizeof(int32_t));
+    int islandGroupInhabitantIslands;
+    readInfo(fd, &islandGroupInhabitantIslands, sizeof (int32_t));
+    if (islandGroupInhabitantIslands > islandGroupIslands)
+    {
+        changeIslandGroupInhabitantIslands(fd, name, islandGroupIslands,
+                                           inputSize);
+    }
     return 0;
 }
 
-/*! \brief Changes the females number of one group in the file
- *
- * \param fd File descriptor
- * \param groupName The name of a group where a new females number will be
- * \param newFemalesNumber A new females number of the group
- *
- *  \return Is there such a group (0) or not (-1)
- */
 int changeIslandGroupInhabitantIslands(int fd, char* name,
-                                       int islandGroupInhabitantIslands,
+                                       int islandGroupInhIslands,
                                        int inputSize)
 {
     if (seekToGroupByName(fd, name, inputSize) != 0)
     {
         return -1;
     }
-    lseek(fd, (int) sizeof(char) * inputSize + (int) sizeof(int32_t),
-          SEEK_CUR);
-    writeInfo(fd, &islandGroupInhabitantIslands, sizeof(int32_t));
+    lseek(fd, (int) sizeof(char) * inputSize, SEEK_CUR);
+    int islandGroupIslands;
+    readInfo(fd, &islandGroupIslands, sizeof(int32_t));
+    if (islandGroupIslands < islandGroupInhIslands)
+    {
+        return -1;
+    }
+    writeInfo(fd, &islandGroupInhIslands, sizeof(int32_t));
     return 0;
 }
 
+/*! \brief Prints island group, seeked in fd
+ *
+ *  \param fd         File descriptor
+ *  \param inputSize  Maximal  size of island groups' name
+ */
 void printIslandGroup(int fd, int inputSize)
 {
-    char* currentIslandGroupName;
-    currentIslandGroupName = (char*) malloc(inputSize * sizeof(char));
     char stringInputBuffer[MAX_INPUT_SIZE];
     int32_t currentIslandGroupIslands;
     int32_t currentIslandGroupInhabitantIslands;
-
     readInfo(fd, &stringInputBuffer, sizeof(char) *
                                      inputSize);
-    puts(stringInputBuffer);
-    strcpy(currentIslandGroupName, stringInputBuffer);
     readInfo(fd, &currentIslandGroupIslands, sizeof(int32_t));
     readInfo(fd, &currentIslandGroupInhabitantIslands, sizeof(int32_t));
 
     printf("Island %s, %d inhabitant islands of %d islands overall;\n",
-           currentIslandGroupName,
+           stringInputBuffer,
            currentIslandGroupInhabitantIslands,
            currentIslandGroupIslands);
-    free(currentIslandGroupName);
 }
 
 void printIslandGroupByName(int fd, char* name, int inputSize)
@@ -343,7 +343,38 @@ void printIslandGroupByName(int fd, char* name, int inputSize)
     printIslandGroup(fd, inputSize);
 }
 
-void printAllIslandGroup(int fd, int inputSize)
+void printIslandGroupsByIslands(int fd, int islands, int inputSize)
+{
+    int tempFd;
+    if (prepareNewFile(&tempFd, TEMP_FILE_NAME, inputSize) != 0)
+    {
+        printf("Something went wrong while creating temp file\n");
+        return;
+    }
+    char currentIslandGroupName[MAX_INPUT_SIZE];
+    int32_t currentIslandGroupIslands;
+    int32_t currentIslandGroupInhabitantIslands;
+    lseek(fd, sizeof(int32_t), SEEK_SET);
+    while (lseek(fd, 0, SEEK_CUR) < getFileSize(fd))
+    {
+        readInfo(fd, currentIslandGroupName, sizeof(char) *
+                                             inputSize);
+        readInfo(fd, &currentIslandGroupIslands, sizeof(int32_t));
+        readInfo(fd, &currentIslandGroupInhabitantIslands, sizeof(int32_t));
+
+        if (currentIslandGroupIslands == islands)
+        {
+            writeIslandGroup(tempFd, currentIslandGroupName,
+                             currentIslandGroupIslands,
+                             currentIslandGroupInhabitantIslands, inputSize);
+        }
+    }
+    printAllIslandGroups(tempFd, inputSize);
+    close(tempFd);
+    deleteFile(TEMP_FILE_NAME);
+}
+
+void printAllIslandGroups(int fd, int inputSize)
 {
     lseek(fd, sizeof(int32_t), SEEK_SET);
     while (lseek(fd, 0, SEEK_CUR) < getFileSize(fd))
@@ -352,7 +383,7 @@ void printAllIslandGroup(int fd, int inputSize)
     }
 }
 
-bool isAnyUninhabitant(int fd, int inputSize)
+bool isAnyUninhabited(int fd, int inputSize)
 {
     int32_t currentIslandGroupInhabitantIslands;
     lseek(fd, sizeof(int32_t), SEEK_SET);
@@ -369,25 +400,11 @@ bool isAnyUninhabitant(int fd, int inputSize)
     return false;
 }
 
-// ⣿⣿⣷⡁⢆⠈⠕⢕⢂⢕⢂⢕⢂⢔⢂⢕⢄⠂⣂⠂⠆⢂⢕⢂⢕⢂⢕⢂⢕⢂
-// ⣿⣿⣿⡷⠊⡢⡹⣦⡑⢂⢕⢂⢕⢂⢕⢂⠕⠔⠌⠝⠛⠶⠶⢶⣦⣄⢂⢕⢂⢕
-// ⣿⣿⠏⣠⣾⣦⡐⢌⢿⣷⣦⣅⡑⠕⠡⠐⢿⠿⣛⠟⠛⠛⠛⠛⠡⢷⡈⢂⢕⢂
-// ⠟⣡⣾⣿⣿⣿⣿⣦⣑⠝⢿⣿⣿⣿⣿⣿⡵⢁⣤⣶⣶⣿⢿⢿⢿⡟⢻⣤⢑⢂
-// ⣾⣿⣿⡿⢟⣛⣻⣿⣿⣿⣦⣬⣙⣻⣿⣿⣷⣿⣿⢟⢝⢕⢕⢕⢕⢽⣿⣿⣷⣔
-// ⣿⣿⠵⠚⠉⢀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣗⢕⢕⢕⢕⢕⢕⣽⣿⣿⣿⣿
-// ⢷⣂⣠⣴⣾⡿⡿⡻⡻⣿⣿⣴⣿⣿⣿⣿⣿⣿⣷⣵⣵⣵⣷⣿⣿⣿⣿⣿⣿⡿
-// ⢌⠻⣿⡿⡫⡪⡪⡪⡪⣺⣿⣿⣿⣿⣿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃
-// ⠣⡁⠹⡪⡪⡪⡪⣪⣾⣿⣿⣿⣿⠋⠐⢉⢍⢄⢌⠻⣿⣿⣿⣿⣿⣿⣿⣿⠏⠈
-// ⡣⡘⢄⠙⣾⣾⣾⣿⣿⣿⣿⣿⣿⡀⢐⢕⢕⢕⢕⢕⡘⣿⣿⣿⣿⣿⣿⠏⠠⠈
-// ⠌⢊⢂⢣⠹⣿⣿⣿⣿⣿⣿⣿⣿⣧⢐⢕⢕⢕⢕⢕⢅⣿⣿⣿⣿⡿⢋⢜⠠⠈
-// ⠄⠁⠕⢝⡢⠈⠻⣿⣿⣿⣿⣿⣿⣿⣷⣕⣑⣑⣑⣵⣿⣿⣿⡿⢋⢔⢕⣿⠠⠈
-// ⠨⡂⡀⢑⢕⡅⠂⠄⠉⠛⠻⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢋⢔⢕⢕⣿⣿⠠⠈
-// ⠄⠪⣂⠁⢕⠆⠄⠂⠄⠁⡀⠂⡀⠄⢈⠉⢍⢛⢛⢛⢋⢔⢕⢕⢕⣽⣿⣿⠠⠈
-
 int prepareNewFile(int* fd, char* filename, int inputSize)
 {
+    mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH;
     int fdReturn;
-    fdReturn = open(filename, O_RDWR | O_CREAT | O_TRUNC);
+    fdReturn = open(filename, O_RDWR | O_CREAT | O_TRUNC, mode);
     if (fdReturn < 0)
     {
         return -1;
@@ -404,7 +421,7 @@ int openFile(int* fd, char* filename, int* inputSize)
         return -1;
     }
     *fd = open(filename, O_RDWR);
-    if (fd < 0)
+    if (*fd < 0)
     {
         return -1;
     }
