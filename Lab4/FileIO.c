@@ -23,7 +23,7 @@
  *
  *  \return true if exists, false otherwise
  */
-bool fileExistCheck(char* path)
+bool FileExistCheck(char* path)
 {
     return (access(path, F_OK) == 0);
 }
@@ -34,7 +34,7 @@ bool fileExistCheck(char* path)
  *
  *  \return Size of file
  */
-int getFileSize(int fd)
+int GetFileSize(int fd)
 {
     struct stat info;
     int fstatSuccess = fstat(fd, &info);
@@ -51,7 +51,7 @@ int getFileSize(int fd)
  *
  *  \return 0 on success, -1 otherwise
  */
-int deleteFile(char* filename)
+int DeleteFile(char* filename)
 {
     int removeReturn = remove(filename);
     if (removeReturn != 0)
@@ -70,7 +70,7 @@ int deleteFile(char* filename)
  *
  *  \return 0 on success, -1 otherwise
  */
-int writeInfo(int fd, void* info, size_t size)
+int WriteInfo(int fd, void* info, size_t size)
 {
     int writeReturn = (int) write(fd, info, size);
 
@@ -95,12 +95,12 @@ int writeInfo(int fd, void* info, size_t size)
  *
  *  \return 0 on success, -1 otherwise
  */
-int writeMeta(int fd, int32_t inputSize)
+int WriteMeta(int fd, int32_t inputSize)
 {
     lseek(fd, 0, SEEK_SET);
-    if (getFileSize(fd) == 0)
+    if (GetFileSize(fd) == 0)
     {
-        return writeInfo(fd, &inputSize, sizeof(int32_t));
+        return WriteInfo(fd, &inputSize, sizeof(int32_t));
     }
     return -1;
 }
@@ -113,7 +113,7 @@ int writeMeta(int fd, int32_t inputSize)
  *
  *  \return 0 on success, -1 otherwise
  */
-int readInfo(int fd, void* info, size_t size)
+int ReadInfo(int fd, void* info, size_t size)
 {
     int readReturn = (int) read(fd, info, size);
 
@@ -138,11 +138,11 @@ int readInfo(int fd, void* info, size_t size)
  *
  *  \return 0 on success, -1 otherwise
  */
-int readMeta(int fd, int* inputSize)
+int ReadMeta(int fd, int* inputSize)
 {
     lseek(fd, 0, SEEK_SET);
     int readReturn;
-    readReturn = readInfo(fd, (void*) inputSize, sizeof(int32_t));
+    readReturn = ReadInfo(fd, (void*) inputSize, sizeof(int32_t));
     if (readReturn <= 0)
     {
         perror("Meta info error");
@@ -159,15 +159,15 @@ int readMeta(int fd, int* inputSize)
  *
  *  \return 0 if group was found and seek set, -1 otherwise
  */
-int seekToGroupByName(int fd, char* groupName, int inputSize)
+int SeekToGroupByName(int fd, char* groupName, int inputSize)
 {
     lseek(fd, sizeof(int32_t), SEEK_SET);
     char currentGroupName[MAX_INPUT_SIZE];
     strcpy(currentGroupName, groupName);
 
-    while (lseek(fd, 0, SEEK_CUR) < getFileSize(fd))
+    while (lseek(fd, 0, SEEK_CUR) < GetFileSize(fd))
     {
-        readInfo(fd, &currentGroupName, sizeof(char) *
+        ReadInfo(fd, &currentGroupName, sizeof(char) *
                                         inputSize);
         if (strcmp(groupName, currentGroupName) == 0)
         {
@@ -184,7 +184,7 @@ int seekToGroupByName(int fd, char* groupName, int inputSize)
 /*! \brief Writes information about island group to the file.
  *
  *  \details This function doesn't check if name is unique and information is
- *  consistent. Should only be used as in addIslandGroup().
+ *  consistent. Should only be used as in AddIslandGroup().
  *  be called after additional
  *
  *  \param fd                     File descriptor
@@ -193,36 +193,36 @@ int seekToGroupByName(int fd, char* groupName, int inputSize)
  *  \param islandGroupInhIslands  Number of inhabitant islands in group
  *  \param inputSize              Maximal size of island groups' name
  */
-void writeIslandGroup(int fd, char* islandGroupName,
+void WriteIslandGroup(int fd, char* islandGroupName,
                       int32_t islandGroupIslands,
                       int32_t islandGroupInhIslands,
                       int inputSize)
 {
     lseek(fd, 0, SEEK_END);
-    writeInfo(fd, islandGroupName, sizeof(char) * inputSize);
-    writeInfo(fd, (void*) &islandGroupIslands, sizeof(int32_t));
-    writeInfo(fd, (void*) &islandGroupInhIslands, sizeof(int32_t));
+    WriteInfo(fd, islandGroupName, sizeof(char) * inputSize);
+    WriteInfo(fd, (void*) &islandGroupIslands, sizeof(int32_t));
+    WriteInfo(fd, (void*) &islandGroupInhIslands, sizeof(int32_t));
 }
 
 
-int addIslandGroup(int fd, char* islandGroupName, int32_t islandGroupIslands,
+int AddIslandGroup(int fd, char* islandGroupName, int32_t islandGroupIslands,
                    int32_t islandGroupInhabitantIslands, int inputSize)
 {
     if (islandGroupInhabitantIslands > islandGroupIslands ||
-        seekToGroupByName(fd, islandGroupName, inputSize) != -1)
+        SeekToGroupByName(fd, islandGroupName, inputSize) != -1)
     {
         return -1;
     }
-    writeIslandGroup(fd, islandGroupName, islandGroupIslands,
+    WriteIslandGroup(fd, islandGroupName, islandGroupIslands,
                      islandGroupInhabitantIslands, inputSize);
     return 0;
 }
 
-bool deleteGroupByName(int* fd, char* islandGroupName, char* filename,
+bool DeleteGroupByName(int* fd, char* islandGroupName, char* filename,
                        int inputSize)
 {
     int tempFd;
-    if (prepareNewFile(&tempFd, TEMP_FILE_NAME, inputSize) != 0)
+    if (PrepareNewFile(&tempFd, TEMP_FILE_NAME, inputSize) != 0)
     {
         printf("Something went wrong while creating temp file\n");
         return false;
@@ -232,12 +232,12 @@ bool deleteGroupByName(int* fd, char* islandGroupName, char* filename,
     int32_t currentIslandGroupInhabitantIslands;
     lseek(*fd, sizeof(int32_t), SEEK_SET);
     bool found = false;
-    while (lseek(*fd, 0, SEEK_CUR) < getFileSize(*fd))
+    while (lseek(*fd, 0, SEEK_CUR) < GetFileSize(*fd))
     {
-        readInfo(*fd, stringInputBuffer, sizeof(char) *
+        ReadInfo(*fd, stringInputBuffer, sizeof(char) *
                                          inputSize);
-        readInfo(*fd, &currentIslandGroupIslands, sizeof(int32_t));
-        readInfo(*fd, &currentIslandGroupInhabitantIslands, sizeof(int32_t));
+        ReadInfo(*fd, &currentIslandGroupIslands, sizeof(int32_t));
+        ReadInfo(*fd, &currentIslandGroupInhabitantIslands, sizeof(int32_t));
 
         if (strcmp(islandGroupName, stringInputBuffer) == 0)
         {
@@ -247,14 +247,14 @@ bool deleteGroupByName(int* fd, char* islandGroupName, char* filename,
         char* currentIslandGroupName = (char*) malloc(
                 inputSize * sizeof(char));
         strcpy(currentIslandGroupName, stringInputBuffer);
-        writeIslandGroup(tempFd, currentIslandGroupName,
+        WriteIslandGroup(tempFd, currentIslandGroupName,
                          currentIslandGroupIslands,
                          currentIslandGroupInhabitantIslands, inputSize);
         free(currentIslandGroupName);
     }
     close(*fd);
     *fd = tempFd;
-    deleteFile(filename);
+    DeleteFile(filename);
     int renameReturn = rename(TEMP_FILE_NAME, filename);
     if (renameReturn != 0)
     {
@@ -263,52 +263,52 @@ bool deleteGroupByName(int* fd, char* islandGroupName, char* filename,
     return found;
 }
 
-int changeIslandGroupName(int fd, char* name, char* newName, int inputSize)
+int ChangeIslandGroupName(int fd, char* name, char* newName, int inputSize)
 {
-    if (seekToGroupByName(fd, name, inputSize) != 0)
+    if (SeekToGroupByName(fd, name, inputSize) != 0)
     {
         return -1;
     }
-    writeInfo(fd, newName, sizeof(char) *
+    WriteInfo(fd, newName, sizeof(char) *
                            inputSize);
     return 0;
 }
 
-int changeIslandGroupIslands(int fd, char* name, int islandGroupIslands,
+int ChangeIslandGroupIslands(int fd, char* name, int islandGroupIslands,
                              int inputSize)
 {
-    if (seekToGroupByName(fd, name, inputSize) != 0)
+    if (SeekToGroupByName(fd, name, inputSize) != 0)
     {
         return -1;
     }
     lseek(fd, (int) sizeof(char) * inputSize, SEEK_CUR);
-    writeInfo(fd, &islandGroupIslands, sizeof(int32_t));
+    WriteInfo(fd, &islandGroupIslands, sizeof(int32_t));
     int islandGroupInhabitantIslands;
-    readInfo(fd, &islandGroupInhabitantIslands, sizeof (int32_t));
+    ReadInfo(fd, &islandGroupInhabitantIslands, sizeof (int32_t));
     if (islandGroupInhabitantIslands > islandGroupIslands)
     {
-        changeIslandGroupInhabitantIslands(fd, name, islandGroupIslands,
+        ChangeIslandGroupInhabitantIslands(fd, name, islandGroupIslands,
                                            inputSize);
     }
     return 0;
 }
 
-int changeIslandGroupInhabitantIslands(int fd, char* name,
+int ChangeIslandGroupInhabitantIslands(int fd, char* name,
                                        int islandGroupInhIslands,
                                        int inputSize)
 {
-    if (seekToGroupByName(fd, name, inputSize) != 0)
+    if (SeekToGroupByName(fd, name, inputSize) != 0)
     {
         return -1;
     }
     lseek(fd, (int) sizeof(char) * inputSize, SEEK_CUR);
     int islandGroupIslands;
-    readInfo(fd, &islandGroupIslands, sizeof(int32_t));
+    ReadInfo(fd, &islandGroupIslands, sizeof(int32_t));
     if (islandGroupIslands < islandGroupInhIslands)
     {
         return -1;
     }
-    writeInfo(fd, &islandGroupInhIslands, sizeof(int32_t));
+    WriteInfo(fd, &islandGroupInhIslands, sizeof(int32_t));
     return 0;
 }
 
@@ -317,15 +317,15 @@ int changeIslandGroupInhabitantIslands(int fd, char* name,
  *  \param fd         File descriptor
  *  \param inputSize  Maximal  size of island groups' name
  */
-void printIslandGroup(int fd, int inputSize)
+void PrintIslandGroup(int fd, int inputSize)
 {
     char stringInputBuffer[MAX_INPUT_SIZE];
     int32_t currentIslandGroupIslands;
     int32_t currentIslandGroupInhabitantIslands;
-    readInfo(fd, &stringInputBuffer, sizeof(char) *
+    ReadInfo(fd, &stringInputBuffer, sizeof(char) *
                                      inputSize);
-    readInfo(fd, &currentIslandGroupIslands, sizeof(int32_t));
-    readInfo(fd, &currentIslandGroupInhabitantIslands, sizeof(int32_t));
+    ReadInfo(fd, &currentIslandGroupIslands, sizeof(int32_t));
+    ReadInfo(fd, &currentIslandGroupInhabitantIslands, sizeof(int32_t));
 
     printf("Island %s, %d inhabitant islands of %d islands overall;\n",
            stringInputBuffer,
@@ -333,20 +333,20 @@ void printIslandGroup(int fd, int inputSize)
            currentIslandGroupIslands);
 }
 
-void printIslandGroupByName(int fd, char* name, int inputSize)
+void PrintIslandGroupByName(int fd, char* name, int inputSize)
 {
-    if (seekToGroupByName(fd, name, inputSize) != 0)
+    if (SeekToGroupByName(fd, name, inputSize) != 0)
     {
         printf("Island group not found!\n");
         return;
     }
-    printIslandGroup(fd, inputSize);
+    PrintIslandGroup(fd, inputSize);
 }
 
-void printIslandGroupsByIslands(int fd, int islands, int inputSize)
+void PrintIslandGroupsByIslands(int fd, int islands, int inputSize)
 {
     int tempFd;
-    if (prepareNewFile(&tempFd, TEMP_FILE_NAME, inputSize) != 0)
+    if (PrepareNewFile(&tempFd, TEMP_FILE_NAME, inputSize) != 0)
     {
         printf("Something went wrong while creating temp file\n");
         return;
@@ -355,42 +355,42 @@ void printIslandGroupsByIslands(int fd, int islands, int inputSize)
     int32_t currentIslandGroupIslands;
     int32_t currentIslandGroupInhabitantIslands;
     lseek(fd, sizeof(int32_t), SEEK_SET);
-    while (lseek(fd, 0, SEEK_CUR) < getFileSize(fd))
+    while (lseek(fd, 0, SEEK_CUR) < GetFileSize(fd))
     {
-        readInfo(fd, currentIslandGroupName, sizeof(char) *
+        ReadInfo(fd, currentIslandGroupName, sizeof(char) *
                                              inputSize);
-        readInfo(fd, &currentIslandGroupIslands, sizeof(int32_t));
-        readInfo(fd, &currentIslandGroupInhabitantIslands, sizeof(int32_t));
+        ReadInfo(fd, &currentIslandGroupIslands, sizeof(int32_t));
+        ReadInfo(fd, &currentIslandGroupInhabitantIslands, sizeof(int32_t));
 
         if (currentIslandGroupIslands == islands)
         {
-            writeIslandGroup(tempFd, currentIslandGroupName,
+            WriteIslandGroup(tempFd, currentIslandGroupName,
                              currentIslandGroupIslands,
                              currentIslandGroupInhabitantIslands, inputSize);
         }
     }
-    printAllIslandGroups(tempFd, inputSize);
+    PrintAllIslandGroups(tempFd, inputSize);
     close(tempFd);
-    deleteFile(TEMP_FILE_NAME);
+    DeleteFile(TEMP_FILE_NAME);
 }
 
-void printAllIslandGroups(int fd, int inputSize)
+void PrintAllIslandGroups(int fd, int inputSize)
 {
     lseek(fd, sizeof(int32_t), SEEK_SET);
-    while (lseek(fd, 0, SEEK_CUR) < getFileSize(fd))
+    while (lseek(fd, 0, SEEK_CUR) < GetFileSize(fd))
     {
-        printIslandGroup(fd, inputSize);
+        PrintIslandGroup(fd, inputSize);
     }
 }
 
-bool isAnyUninhabited(int fd, int inputSize)
+bool IsAnyUninhabited(int fd, int inputSize)
 {
     int32_t currentIslandGroupInhabitantIslands;
     lseek(fd, sizeof(int32_t), SEEK_SET);
-    while (lseek(fd, 0, SEEK_CUR) < getFileSize(fd))
+    while (lseek(fd, 0, SEEK_CUR) < GetFileSize(fd))
     {
         lseek(fd, sizeof(char) * inputSize + sizeof(int32_t), SEEK_CUR);
-        readInfo(fd, &currentIslandGroupInhabitantIslands, sizeof(int32_t));
+        ReadInfo(fd, &currentIslandGroupInhabitantIslands, sizeof(int32_t));
 
         if (currentIslandGroupInhabitantIslands == 0)
         {
@@ -400,7 +400,7 @@ bool isAnyUninhabited(int fd, int inputSize)
     return false;
 }
 
-int prepareNewFile(int* fd, char* filename, int inputSize)
+int PrepareNewFile(int* fd, char* filename, int inputSize)
 {
     mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH;
     int fdReturn;
@@ -410,13 +410,13 @@ int prepareNewFile(int* fd, char* filename, int inputSize)
         return -1;
     }
     *fd = fdReturn;
-    writeMeta(*fd, inputSize);
+    WriteMeta(*fd, inputSize);
     return 0;
 }
 
-int openFile(int* fd, char* filename, int* inputSize)
+int OpenFile(int* fd, char* filename, int* inputSize)
 {
-    if (!fileExistCheck(filename))
+    if (!FileExistCheck(filename))
     {
         return -1;
     }
@@ -425,7 +425,7 @@ int openFile(int* fd, char* filename, int* inputSize)
     {
         return -1;
     }
-    if (readMeta(*fd, inputSize) != 0)
+    if (ReadMeta(*fd, inputSize) != 0)
     {
         return -1;
     }

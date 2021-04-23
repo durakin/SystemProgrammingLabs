@@ -20,7 +20,7 @@
  *
  *  \return 0 on success, -1 otherwise
  */
-int addIslandGroup(int fd, char* islandGroupName, int32_t islandGroupIslands,
+int AddIslandGroup(int fd, char* islandGroupName, int32_t islandGroupIslands,
                    int32_t islandGroupInhabitantIslands, int inputSize);
 
 /*! \brief Deletes island group from list by name
@@ -35,7 +35,7 @@ int addIslandGroup(int fd, char* islandGroupName, int32_t islandGroupIslands,
  *
  *  \return true if something was deleted, false otherwise
  */
-bool deleteGroupByName(int* fd, char* islandGroupName, char* filename,
+bool DeleteGroupByName(int* fd, char* islandGroupName, char* filename,
                        int inputSize);
 
 /*! \brief Changes the name of one group in the file
@@ -47,7 +47,7 @@ bool deleteGroupByName(int* fd, char* islandGroupName, char* filename,
  *
  *  \return 0 if group was found, -1 otherwise
  */
-int changeIslandGroupName(int fd, char* name, char* newName, int inputSize);
+int ChangeIslandGroupName(int fd, char* name, char* newName, int inputSize);
 
 /*! \brief Changes overall number of islands in group by name
  *
@@ -62,7 +62,7 @@ int changeIslandGroupName(int fd, char* name, char* newName, int inputSize);
  *
  *  \return 0 if island group was found and changed, -1 otherwise
  */
-int changeIslandGroupIslands(int fd, char* name, int islandGroupIslands,
+int ChangeIslandGroupIslands(int fd, char* name, int islandGroupIslands,
                              int inputSize);
 
 /*! \brief Changes number of inhabitant islands in group by name
@@ -77,7 +77,7 @@ int changeIslandGroupIslands(int fd, char* name, int islandGroupIslands,
  *
  *  \return 0 if island group was found and changed, -1 otherwise
  */
-int changeIslandGroupInhabitantIslands(int fd, char* name,
+int ChangeIslandGroupInhabitantIslands(int fd, char* name,
                                        int islandGroupInhIslands,
                                        int inputSize);
 
@@ -87,7 +87,7 @@ int changeIslandGroupInhabitantIslands(int fd, char* name,
  *  \param char       Name of group to print
  *  \param inputSize  Maximal  size of island groups' name
  */
-void printIslandGroupByName(int fd, char* name, int inputSize);
+void PrintIslandGroupByName(int fd, char* name, int inputSize);
 
 /*! \brief Prints island groups, by number of islands
  *
@@ -97,7 +97,7 @@ void printIslandGroupByName(int fd, char* name, int inputSize);
  *  \param islands    Required number of islands
  *  \param inputSize  Maximal  size of island groups' name
  */
-void printIslandGroupsByIslands(int fd, int islands, int inputSize);
+void PrintIslandGroupsByIslands(int fd, int islands, int inputSize);
 
 /*! \brief Prints island groups, by number of islands
  *
@@ -107,7 +107,7 @@ void printIslandGroupsByIslands(int fd, int islands, int inputSize);
  *  \param islands    Required number of islands
  *  \param inputSize  Maximal  size of island groups' name
  */
-void printAllIslandGroups(int fd, int inputSize);
+void PrintAllIslandGroups(int fd, int inputSize);
 
 /*! \brief Checks if any island group in file hasn't any inhabitant island
  *
@@ -117,7 +117,7 @@ void printAllIslandGroups(int fd, int inputSize);
  *  \return true if any island group in file hasn't any inhabitant island,
  *  false otherwise
  */
-bool isAnyUninhabited(int fd, int inputSize);
+bool IsAnyUninhabited(int fd, int inputSize);
 
 /*! \brief Prepares new file for saving island groups info
  *
@@ -130,7 +130,7 @@ bool isAnyUninhabited(int fd, int inputSize);
  *
  *  \return 0 on success, -1 otherwise.
  */
-int prepareNewFile(int* fd, char* filename, int inputSize);
+int PrepareNewFile(int* fd, char* filename, int inputSize);
 
 /*! \brief Opens file and reads meta
  *
@@ -144,7 +144,7 @@ int prepareNewFile(int* fd, char* filename, int inputSize);
  *
  *  \return 0 on success, -1 otherwise.
  */
-int openFile(int* fd, char* filename, int* inputSize);
+int OpenFile(int* fd, char* filename, int* inputSize);
 
 
 #endif //FILEIO_H

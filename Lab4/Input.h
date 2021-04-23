@@ -28,7 +28,7 @@ enum sizes
  *
  *  \return Integer read correct integer
  */
-int checkedInputInt(bool(* additionalCheck)(int));
+int CheckedInputInt(bool(* additionalCheck)(int));
 
 /*! \brief Reads string
  *
@@ -39,7 +39,7 @@ int checkedInputInt(bool(* additionalCheck)(int));
  *  \param bool*        Pointer to the additional check function
  *  \param inputSize    Maximal size of read string
  */
-void checkedInputString(char* destination, bool(* additionalCheck)(char*),
+void CheckedInputString(char* destination, bool(* additionalCheck)(char*),
                         int inputSize);
 
 

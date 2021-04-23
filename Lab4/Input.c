@@ -6,7 +6,7 @@
 #include "malloc.h"
 
 
-int checkedInputInt(bool(* additionalCheck)(int))
+int CheckedInputInt(bool(* additionalCheck)(int))
 {
     int result;
     char inputString[MAX_INPUT_SIZE];
@@ -30,7 +30,7 @@ int checkedInputInt(bool(* additionalCheck)(int))
 }
 
 
-void checkedInputString(char* destination, bool(* additionalCheck)(char*),
+void CheckedInputString(char* destination, bool(* additionalCheck)(char*),
                         int inputSize)
 {
     char input[MAX_INPUT_SIZE];

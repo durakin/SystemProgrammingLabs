@@ -101,7 +101,7 @@ bool ModifyMenuInputCheck(int operationCode)
  *  \return true if number can be a modify menu operation codes
  *  false - otherwise
  */
-bool nameInputCheck(char* stringToCheck)
+bool NameInputCheck(char* stringToCheck)
 {
     for (int i = 0; i < strlen(stringToCheck); i++)
     {
@@ -121,7 +121,7 @@ bool nameInputCheck(char* stringToCheck)
  *
  *  \return true if number can be an overall number of islands in group
  */
-bool islandsNumberCheck(int numberToCheck)
+bool IslandsNumberCheck(int numberToCheck)
 {
     return numberToCheck > 0;
 }
@@ -132,7 +132,7 @@ bool islandsNumberCheck(int numberToCheck)
  *
  *  \return true if number can be a number of inhabitant islands in group
  */
-bool inhabitedIslandsNumberCheck(int numberToCheck)
+bool InhabitedIslandsNumberCheck(int numberToCheck)
 {
     return numberToCheck >= 0;
 }
@@ -161,7 +161,7 @@ int main()
                "4. Modify data.\n"
                "5. Change save file.\n"
                "6. Quit.\n");
-        operationCode = checkedInputInt(MainMenuInputCheck);
+        operationCode = CheckedInputInt(MainMenuInputCheck);
 
         if (!loaded && operationCode != CHANGE_FILE && operationCode != QUIT)
         {
@@ -174,15 +174,15 @@ int main()
                 printf("Enter island group's name\n");
                 char* name;
                 name = (char*) malloc(inputSize * sizeof(char));
-                checkedInputString(name, nameInputCheck, inputSize);
+                CheckedInputString(name, NameInputCheck, inputSize);
                 int islands;
                 printf("Enter overall number of islands in group\n");
-                islands = checkedInputInt(islandsNumberCheck);
+                islands = CheckedInputInt(IslandsNumberCheck);
                 int inhabitedIslands;
                 printf("Enter number of inhabited islands in group\n");
-                inhabitedIslands = checkedInputInt(
-                        inhabitedIslandsNumberCheck);
-                if (addIslandGroup(fd, name, islands, inhabitedIslands,
+                inhabitedIslands = CheckedInputInt(
+                        InhabitedIslandsNumberCheck);
+                if (AddIslandGroup(fd, name, islands, inhabitedIslands,
                                    inputSize) == 0)
                 {
                     printf("Added!\n");
@@ -208,28 +208,28 @@ int main()
                        "\n4. Print all island group."
                        "\n5. Back."
                        "\n");
-                subOperationCode = checkedInputInt(PrintMenuInputCheck);
+                subOperationCode = CheckedInputInt(PrintMenuInputCheck);
                 if (subOperationCode == PRINT_BY_NAME)
                 {
                     char* name;
                     name = (char*) malloc(inputSize * sizeof(char));
                     printf("Enter required group's name\n");
-                    checkedInputString(name, nameInputCheck, inputSize);
-                    printIslandGroupByName(fd, name, inputSize);
+                    CheckedInputString(name, NameInputCheck, inputSize);
+                    PrintIslandGroupByName(fd, name, inputSize);
                     free(name);
                 }
                 if (subOperationCode == PRINT_BY_ISLANDS)
                 {
                     int requiredIslands;
                     printf("Enter required number of islands\n");
-                    requiredIslands = checkedInputInt(
-                            islandsNumberCheck);
-                    printIslandGroupsByIslands(fd, requiredIslands,
+                    requiredIslands = CheckedInputInt(
+                            IslandsNumberCheck);
+                    PrintIslandGroupsByIslands(fd, requiredIslands,
                                                inputSize);
                 }
                 if (subOperationCode == PRINT_IF_ANY_UNINHABITED)
                 {
-                    if (isAnyUninhabited(fd, inputSize))
+                    if (IsAnyUninhabited(fd, inputSize))
                     {
                         printf("Found at least one totally uninhabited"
                                "island group\n");
@@ -243,7 +243,7 @@ int main()
                 }
                 if (subOperationCode == PRINT_ALL)
                 {
-                    printAllIslandGroups(fd, inputSize);
+                    PrintAllIslandGroups(fd, inputSize);
                 }
                 if (subOperationCode == PRINT_BACK)
                 {
@@ -257,9 +257,9 @@ int main()
             char* name;
             name = (char*) malloc(inputSize * sizeof(char));
             printf("Enter required group's name\n");
-            checkedInputString(name, nameInputCheck, inputSize);
+            CheckedInputString(name, NameInputCheck, inputSize);
 
-            if (deleteGroupByName(&fd, name, filename, inputSize))
+            if (DeleteGroupByName(&fd, name, filename, inputSize))
             {
                 printf("Deleted!\n");
             }
@@ -277,19 +277,19 @@ int main()
                    "\n3. Change island group number of inhabited islands."
                    "\n4. Back."
                    "\n");
-            subOperationCode = checkedInputInt(ModifyMenuInputCheck);
+            subOperationCode = CheckedInputInt(ModifyMenuInputCheck);
             if (subOperationCode == MODIFY_NAME)
             {
                 char* originalName;
                 printf("Enter required group's name\n");
                 originalName = (char*) malloc(inputSize * sizeof(char));
-                checkedInputString(originalName, nameInputCheck, inputSize);
+                CheckedInputString(originalName, NameInputCheck, inputSize);
                 char* newName;
                 printf("Enter new name for this island group\n");
                 newName = (char*) malloc(inputSize * sizeof(char));
-                checkedInputString(newName, nameInputCheck, inputSize);
+                CheckedInputString(newName, NameInputCheck, inputSize);
 
-                if (changeIslandGroupName(fd, originalName,
+                if (ChangeIslandGroupName(fd, originalName,
                                           newName, inputSize) == 0)
                 {
                     printf("Name changed!\n");
@@ -308,11 +308,11 @@ int main()
                 char* name;
                 name = (char*) malloc(inputSize * sizeof(char));
                 printf("Enter required group's name\n");
-                checkedInputString(name, nameInputCheck, inputSize);
+                CheckedInputString(name, NameInputCheck, inputSize);
                 int newIslands;
                 printf("Enter new overall number of islands in group\n");
-                newIslands = checkedInputInt(islandsNumberCheck);
-                if (changeIslandGroupIslands(fd, name,
+                newIslands = CheckedInputInt(IslandsNumberCheck);
+                if (ChangeIslandGroupIslands(fd, name,
                                              newIslands, inputSize) == 0)
                 {
                     printf("Number of islands changed!\n");
@@ -328,12 +328,12 @@ int main()
                 char* name;
                 name = (char*) malloc(inputSize * sizeof(char));
                 printf("Enter required group's name\n");
-                checkedInputString(name, nameInputCheck, inputSize);
+                CheckedInputString(name, NameInputCheck, inputSize);
                 int newInhabitedIslands;
                 printf("Enter new number of inhabited islands in group\n");
-                newInhabitedIslands = checkedInputInt(
-                        inhabitedIslandsNumberCheck);
-                if (changeIslandGroupInhabitantIslands(fd, name,
+                newInhabitedIslands = CheckedInputInt(
+                        InhabitedIslandsNumberCheck);
+                if (ChangeIslandGroupInhabitantIslands(fd, name,
                                                        newInhabitedIslands,
                                                        inputSize) == 0)
                 {
@@ -361,13 +361,13 @@ int main()
                 printf("\n1. Load existing file."
                        "\n2. Create new file."
                        "\n");
-                subOperationCode = checkedInputInt(ChangeFileMenuInputCheck);
+                subOperationCode = CheckedInputInt(ChangeFileMenuInputCheck);
                 if (subOperationCode == CHANGE_FILE_EXISTING)
                 {
                     printf("Enter name for save file\n");
-                    checkedInputString(filename, nameInputCheck,
+                    CheckedInputString(filename, NameInputCheck,
                                        MAX_INPUT_SIZE);
-                    if (openFile(&fd, filename, &inputSize) == 0)
+                    if (OpenFile(&fd, filename, &inputSize) == 0)
                     {
                         printf("Successfully loaded!\n");
                         break;
@@ -381,11 +381,11 @@ int main()
                 {
                     printf("Enter name for new save file. Warning: if"
                            "such file exists - it will be overwritten\n");
-                    checkedInputString(filename, nameInputCheck,
+                    CheckedInputString(filename, NameInputCheck,
                                        MAX_INPUT_SIZE);
                     printf("Enter size of name string (1 - 63)\n");
-                    inputSize = checkedInputInt(InputSizeInputCheck);
-                    if (prepareNewFile(&fd, filename, inputSize) == 0)
+                    inputSize = CheckedInputInt(InputSizeInputCheck);
+                    if (PrepareNewFile(&fd, filename, inputSize) == 0)
                     {
                         break;
                     }
