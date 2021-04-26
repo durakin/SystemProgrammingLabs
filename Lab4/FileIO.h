@@ -99,6 +99,8 @@ void PrintIslandGroupByName(int fd, char* name, int inputSize);
  */
 void PrintIslandGroupsByIslands(int fd, int islands, int inputSize);
 
+void PrintIslandGroupsOnlyInhabited(int fd, int inputSize);
+
 /*! \brief Prints island groups, by number of islands
  *
  *  \details Creates temp list of suitable islands, prints it and deletes

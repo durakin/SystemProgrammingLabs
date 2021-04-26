@@ -374,6 +374,38 @@ void PrintIslandGroupsByIslands(int fd, int islands, int inputSize)
     DeleteFile(TEMP_FILE_NAME);
 }
 
+void PrintIslandGroupsOnlyInhabited(int fd, int inputSize)
+{
+    int tempFd;
+    if (PrepareNewFile(&tempFd, TEMP_FILE_NAME, inputSize) != 0)
+    {
+        printf("Something went wrong while creating temp file\n");
+        return;
+    }
+    char currentIslandGroupName[MAX_INPUT_SIZE];
+    int32_t currentIslandGroupIslands;
+    int32_t currentIslandGroupInhabitantIslands;
+    lseek(fd, sizeof(int32_t), SEEK_SET);
+    while (lseek(fd, 0, SEEK_CUR) < GetFileSize(fd))
+    {
+        ReadInfo(fd, currentIslandGroupName, sizeof(char) *
+                                             inputSize);
+        ReadInfo(fd, &currentIslandGroupIslands, sizeof(int32_t));
+        ReadInfo(fd, &currentIslandGroupInhabitantIslands, sizeof(int32_t));
+
+        if (currentIslandGroupIslands == currentIslandGroupInhabitantIslands)
+        {
+            WriteIslandGroup(tempFd, currentIslandGroupName,
+                             currentIslandGroupIslands,
+                             currentIslandGroupInhabitantIslands, inputSize);
+        }
+    }
+    PrintAllIslandGroups(tempFd, inputSize);
+    close(tempFd);
+    DeleteFile(TEMP_FILE_NAME);
+}
+
+
 void PrintAllIslandGroups(int fd, int inputSize)
 {
     lseek(fd, sizeof(int32_t), SEEK_SET);

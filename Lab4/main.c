@@ -7,6 +7,8 @@
 #include "FileIO.h"
 #include "Input.h"
 #include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
 
 /*! \enum
  *  \brief  Operation code for main menu and every sub-menu
@@ -17,9 +19,10 @@ enum OperationsCodes
     PRINT = 2,
     PRINT_BY_NAME = 1,
     PRINT_BY_ISLANDS = 2,
-    PRINT_IF_ANY_UNINHABITED = 3,
-    PRINT_ALL = 4,
-    PRINT_BACK = 5,
+    PRINT_ALL_WITH_ONLY_INHABITED = 3,
+    PRINT_IF_ANY_UNINHABITED = 4,
+    PRINT_ALL = 5,
+    PRINT_BACK = 6,
     DELETE = 3,
     MODIFY = 4,
     MODIFY_NAME = 1,
@@ -138,7 +141,7 @@ bool InhabitedIslandsNumberCheck(int numberToCheck)
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
     int fd;
     bool loaded;
@@ -146,6 +149,59 @@ int main()
     int inputSize;
     int operationCode;
     char filename[MAX_INPUT_SIZE];
+
+    if(argc > 1)
+    {
+        if (argc < 3)
+        {
+            printf("Missing argument\n");
+            return 0;
+        }
+        if (argc > 3)
+        {
+            printf("Too many arguments\n");
+            return 0;
+        }
+        if (!NameInputCheck(argv[1]))
+        {
+            printf("Wrong format of file name\n");
+            return 0;
+        }
+        if (!InputSizeInputCheck(atoi(argv[2])))
+        {
+            printf("Wrong format of input size\n");
+            return 0;
+        }
+        strcpy(filename, argv[1]);
+        int requiredInputSize;
+        requiredInputSize = atoi(argv[2]);
+
+        if (OpenFile(&fd, filename, &inputSize) != 0)
+        {
+            if(PrepareNewFile(&fd, filename, requiredInputSize) != 0)
+            {
+                printf("Couldn't load or prepare new save file\n");
+                return 0;
+            }
+            inputSize = requiredInputSize;
+            loaded = true;
+            printf("Couldn't open file, new file was created\n");
+        }
+        if (requiredInputSize != inputSize)
+        {
+            close(fd);
+            if(PrepareNewFile(&fd, filename, requiredInputSize) != 0)
+            {
+                printf("Couldn't load or prepare new save file\n");
+                return 0;
+            }
+            inputSize = requiredInputSize;
+            loaded = true;
+            printf("File was written over because of meta conflict\n");
+        }
+        loaded = true;
+        printf("File was successfully loaded\n");
+    }
 
     while (true)
     {
@@ -203,10 +259,11 @@ int main()
             {
                 printf("\n1. Print group by name."
                        "\n2. Print group by islands number."
-                       "\n3. Check if any island group is totally"
+                       "\n3. Print all island groups with only inhabited islands"
+                       "\n4. Check if any island group is totally"
                        "uninhabited."
-                       "\n4. Print all island group."
-                       "\n5. Back."
+                       "\n5. Print all island group."
+                       "\n6. Back."
                        "\n");
                 subOperationCode = CheckedInputInt(PrintMenuInputCheck);
                 if (subOperationCode == PRINT_BY_NAME)
@@ -226,6 +283,11 @@ int main()
                             IslandsNumberCheck);
                     PrintIslandGroupsByIslands(fd, requiredIslands,
                                                inputSize);
+                }
+                if (subOperationCode == PRINT_ALL_WITH_ONLY_INHABITED)
+                {
+                    PrintIslandGroupsOnlyInhabited(fd, inputSize);
+
                 }
                 if (subOperationCode == PRINT_IF_ANY_UNINHABITED)
                 {
