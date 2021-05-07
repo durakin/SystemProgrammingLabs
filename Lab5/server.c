@@ -72,8 +72,9 @@ int main(int argc, char* const argv[])
         return EXIT_FAILURE;
     }
     int socketFileDescriptor;
+    struct sockaddr_in name;
     int portNumber = atoi(argv[1]);
-    socketFileDescriptor = PrepareServerDgramSocket(portNumber);
+    socketFileDescriptor = PrepareServerDgramSocket(portNumber, &name);
     if (socketFileDescriptor == -1)
     {
         return 0;

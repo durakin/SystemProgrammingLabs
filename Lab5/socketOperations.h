@@ -8,7 +8,7 @@
 
 int PrepareServerDgramSocket(int portNumber, struct sockaddr_in* name);
 
-int ConnectToDgramSocket(char* inetAddress, int portNumber,
+int ConnectToDgramSocket(const char* inetAddress, int portNumber,
                          struct sockaddr_in* name);
 
 void SendToSocket(int socketFileDescriptor, struct sockaddr_in name,

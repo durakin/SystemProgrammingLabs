@@ -26,13 +26,10 @@ int main(int argc, const char* argv[])
 
     int portNumber = atoi(argv[2]);
 
-
-
     struct sockaddr_in name;
-    int socketFileDescriptor;
-
-    socketFileDescriptor = PrepareServerDgramSocket(portNumber, &name);
-    if (socketFileDescriptor < 0)
+    int socketFileDescriptor = 0;
+    socketFileDescriptor = ConnectToDgramSocket(argv[1], portNumber, &name);
+    if (socketFileDescriptor <= 0)
     {
         perror("socket");
     }

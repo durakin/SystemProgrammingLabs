@@ -19,7 +19,7 @@ int PrepareServerDgramSocket(int portNumber, struct sockaddr_in* name)
     name->sin_port = htons((u_short) portNumber);
     name->sin_addr.s_addr = INADDR_ANY;
     if (bind(socketFileDescriptor, (const struct sockaddr*) name,
-             sizeof(*name) == -1))
+             sizeof(*name) )== -1)
     {
         perror("bind");
         close(socketFileDescriptor);
@@ -28,7 +28,7 @@ int PrepareServerDgramSocket(int portNumber, struct sockaddr_in* name)
     return socketFileDescriptor;
 }
 
-int ConnectToDgramSocket(char* inetAddress, int portNumber,
+int ConnectToDgramSocket(const char* inetAddress, int portNumber,
                          struct sockaddr_in* name)
 {
     memset((char*) name, 0, sizeof(*name));
@@ -56,9 +56,11 @@ void SendToSocket(int socketFileDescriptor, struct sockaddr_in name,
     int sendResult;
     sendResult = (int) sendto(socketFileDescriptor, dataBuf, size, 0,
                               (struct sockaddr*) &name, sizeof(name));
+
     if (sendResult <= 0)
     {
         perror("sendto");
+        printf("Error sending\n");
     }
 }
 
@@ -73,5 +75,6 @@ int receiveFromSocket(int socketFileDescriptor, struct sockaddr_in name,
         perror("recvfrom");
         return -1;
     }
+    printf("Read");
     return 0;
 }
