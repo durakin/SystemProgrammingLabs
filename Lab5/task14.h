@@ -11,12 +11,27 @@
 #define LAB1_TASK14_H
 
 
+/*! \struct taskData
+ *  \brief Struct for PerformTask() function
+ *
+ *  \details Keeps data that is used as PerformTask() argument
+ */
 typedef struct
 {
+    /*!
+     * Number in required numeric system
+     */
     char number[INPUT_SIZE];
+    /*!
+     * Radix of numeric system
+     */
     int8_t radix;
 } taskData;
 
+/*! \brief Performs task14 with required output
+ *
+ *  \param data argument for task 14
+ */
 void PerformTask(taskData* data);
 
 /*! \brief Converts number in any (2-20) numeral system to decimal

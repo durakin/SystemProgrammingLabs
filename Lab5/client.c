@@ -1,13 +1,19 @@
+/*! \file   client.c
+ *  \brief  Code of client executable
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include "input.h"
 #include "task14.h"
 
 
+/*! \brief Catches ctrl+C signal, closes socket and terminates server
+ *  \details Parses CL arguments, checks them and sends to the server
+ */
 int main(int argc, const char* argv[])
 {
     if (argc != 5)
@@ -24,20 +30,20 @@ int main(int argc, const char* argv[])
     data->radix = (int8_t) strtol(argv[3], &strtolEndptr, 10);
     if (*strtolEndptr != argv[3][strlen(argv[3])])
     {
-        perror("radix");
-        exit(1);
+        printf("Wrong radix format!\n");
+        return 0;
     }
     if (!RadixInputCheck(data->radix))
     {
-        printf("radix");
-        exit(1);
+        printf("Wrong radix format!\n");
+        return 0;
     }
     strcpy(data->number, argv[4]);
     if (!(CheckIntOverflow(data->number, data->radix) &&
           CheckRadixMatch(data->number, data->radix)))
     {
-        perror("number format");
-        exit(1);
+        printf("Wrong number format!\n");
+        return 0;
     }
 
 
@@ -62,7 +68,7 @@ int main(int argc, const char* argv[])
 
     int resSend;
     resSend = (int) sendto(socketFileDescriptor, data, sizeof(taskData), 0,
-                     (struct sockaddr*) &name, sizeof(name));
+                           (struct sockaddr*) &name, sizeof(name));
     if (0 > resSend)
     {
         perror("sendto");
