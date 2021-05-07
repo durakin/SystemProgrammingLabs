@@ -4,20 +4,29 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include "input.h"
+#include "task14.h"
+
+typedef struct
+{
+    char number[INPUT_SIZE];
+    int8_t radix;
+} taskData;
 
 int server(int serverSocket)
 {
     struct sockaddr_in clientName;
     socklen_t clientNameLength = sizeof(clientName);
+    taskData* data;
+    data = (taskData*) malloc(sizeof(taskData));
+
     while (!0)
     {
-        int length = 0;
         char* text = NULL;
-        int recvResult = (int) recvfrom(serverSocket, &length, sizeof(length),
+        int recvResult = (int) recvfrom(serverSocket, data, sizeof(taskData),
                                         0,
                                         (struct sockaddr*) &clientName,
-                                        &clientNameLength
-        );
+                                        &clientNameLength);
         if (-1 == recvResult)
         {
             perror("recvfrom");
@@ -26,19 +35,33 @@ int server(int serverSocket)
         {
             return 0;
         }
-        text = (char*) malloc(length);
-        bzero(text, length);
-        recvResult = recvfrom(serverSocket, text, length, 0,
-                              (struct sockaddr*) &clientName,
-                              &clientNameLength
-        );
-        printf("%s\n", text);
-        if (0 == strcmp(text, "adios amigo"))
+        char reversedNumber[INPUT_SIZE];
+        char* number = data->number;
+        int8_t radix = data->radix;
+
+        for (int i = (int) strlen(number) - 1; i >= 0; i--)
         {
-            free(text);
-            break;
+            reversedNumber[strlen(number) - (i + 1)] = number[i];
         }
-        free(text);
+        reversedNumber[strlen(number)] = '\0';
+
+        while (reversedNumber[strlen(reversedNumber) - 1] == '0')
+        {
+            reversedNumber[strlen(reversedNumber) - 1] = '\0';
+        }
+
+        printf("Original: %s\n", number);
+        printf("To decimal: %d\n", AnyNumeralSystemToDecimal(number, radix));
+        printf("Reversed: %s\n", reversedNumber);
+        if (CheckIntOverflow(reversedNumber, radix))
+        {
+            printf("Reversed to decimal: %d\n",
+                   AnyNumeralSystemToDecimal(reversedNumber, radix));
+        }
+        else
+        {
+            printf("Reversed number is too big");
+        }
     }
     return 0;
 }

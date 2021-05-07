@@ -3,11 +3,7 @@
  *          essential for task 14
  */
 
-#include <malloc.h>
 #include <stdbool.h>
-#include <math.h>
-#include <string.h>
-#include <stdio.h>
 
 #ifndef LAB1_TASK14_H
 #define LAB1_TASK14_H
