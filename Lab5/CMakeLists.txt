@@ -4,7 +4,7 @@ project(Lab5 C)
 set(CMAKE_C_STANDARD 99)
 
 
-add_executable(Lab5_Server server.c input.h input.c task14.h task14.c)
-add_executable(Lab5_Client client.c input.h input.c task14.h task14.c)
+add_executable(Lab5_Server server.c input.h task14.h task14.c)
+add_executable(Lab5_Client client.c input.h task14.h task14.c)
 target_link_libraries(Lab5_Server m)
 target_link_libraries(Lab5_Client m)
