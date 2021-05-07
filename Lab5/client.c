@@ -8,6 +8,9 @@
 #include "input.h"
 #include "task14.h"
 
+#define MAX_PORT_NUMBER 65365
+#define MIN_PORT_NUMBER 1024
+
 typedef struct
 {
     char number[INPUT_SIZE];
@@ -23,19 +26,36 @@ int main(int argc, const char* argv[])
         return EXIT_FAILURE;
     }
 
+    taskData* data;
+    data = (taskData*) malloc(sizeof (taskData));
 
     int portNumber = atoi(argv[2]);
-
+    int socketFileDescriptor;
     struct sockaddr_in name;
-    int socketFileDescriptor = 0;
-    socketFileDescriptor = ConnectToDgramSocket(argv[1], portNumber, &name);
-    if (socketFileDescriptor <= 0)
+    name.sin_family = AF_INET;
+    name.sin_addr.s_addr = inet_addr(argv[1]);
+    if (INADDR_NONE == name.sin_addr.s_addr)
+    {
+        printf("Wrong address!\n");
+        exit(1);
+    }
+    if ((portNumber > MAX_PORT_NUMBER) || (portNumber < MIN_PORT_NUMBER))
+    {
+        printf("Wrong port!\n");
+        exit(1);
+    }
+    memset((char *) &name, 0, sizeof (name));
+    if (INADDR_NONE == name.sin_addr.s_addr)
+    {
+        perror("inet_addr");
+        exit(1);
+    }
+    name.sin_port = htons((u_short)portNumber);
+    socketFileDescriptor = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (0 > socketFileDescriptor)
     {
         perror("socket");
     }
-
-    taskData* data;
-    data = (taskData*) malloc(sizeof(taskData));
 
     do
     {

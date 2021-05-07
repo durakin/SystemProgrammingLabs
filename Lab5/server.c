@@ -17,7 +17,6 @@ typedef struct
 int server(int serverSocket)
 {
     struct sockaddr_in clientName;
-    socklen_t clientNameLength = sizeof(clientName);
     taskData* data;
     data = (taskData*) malloc(sizeof(taskData));
 
@@ -31,6 +30,7 @@ int server(int serverSocket)
         }
         if (recvResult <= 0)
         {
+            perror("recvfrom");
             return 0;
         }
         char reversedNumber[INPUT_SIZE];

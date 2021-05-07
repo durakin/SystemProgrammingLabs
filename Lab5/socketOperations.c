@@ -5,7 +5,11 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-
+typedef struct
+{
+    char number[INPUT_SIZE];
+    int8_t radix;
+} taskData;
 int PrepareServerDgramSocket(int portNumber, struct sockaddr_in* name)
 {
     int socketFileDescriptor;
@@ -54,6 +58,8 @@ void SendToSocket(int socketFileDescriptor, struct sockaddr_in name,
                   void* dataBuf, size_t size)
 {
     int sendResult;
+    printf("Sending following:\n%s\n%d", ((taskData*) dataBuf)->number, ((taskData*) dataBuf)->radix);
+
     sendResult = (int) sendto(socketFileDescriptor, dataBuf, size, 0,
                               (struct sockaddr*) &name, sizeof(name));
 
