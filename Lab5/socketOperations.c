@@ -4,12 +4,14 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include "input.h"
 
 typedef struct
 {
     char number[INPUT_SIZE];
     int8_t radix;
 } taskData;
+
 int PrepareServerDgramSocket(int portNumber, struct sockaddr_in* name)
 {
     int socketFileDescriptor;
@@ -81,6 +83,6 @@ int receiveFromSocket(int socketFileDescriptor, struct sockaddr_in name,
         perror("recvfrom");
         return -1;
     }
-    printf("Read");
+    printf("Read\n%s\n%d", ((taskData*) dataBuf)->number, ((taskData*) dataBuf)->radix);
     return 0;
 }

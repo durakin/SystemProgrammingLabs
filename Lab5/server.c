@@ -8,11 +8,15 @@
 #include "task14.h"
 #include "socketOperations.h"
 
+#include "input.h"
+#include <stdint.h>
+
 typedef struct
 {
     char number[INPUT_SIZE];
     int8_t radix;
 } taskData;
+
 
 int server(int serverSocket)
 {
@@ -24,15 +28,14 @@ int server(int serverSocket)
     {
         int recvResult = receiveFromSocket(serverSocket, clientName, data,
                                            sizeof(taskData));
-        if (recvResult == -1)
+        puts("A");
+        if (recvResult != 0)
         {
             perror("recvfrom");
-        }
-        if (recvResult <= 0)
-        {
-            perror("recvfrom");
+            puts("Pizda");
             return 0;
         }
+        puts("Nihuya dokuda ti doshla");
         char reversedNumber[INPUT_SIZE];
         char* number = data->number;
         int8_t radix = data->radix;

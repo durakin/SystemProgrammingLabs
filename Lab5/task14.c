@@ -7,8 +7,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-
-
 /*! \enum
  *  \brief  Essential constants for task 14
  */
