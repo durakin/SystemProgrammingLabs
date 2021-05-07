@@ -25,7 +25,7 @@ int PrepareServerDgramSocket(int portNumber, struct sockaddr_in* name)
     name->sin_port = htons((u_short) portNumber);
     name->sin_addr.s_addr = INADDR_ANY;
     if (bind(socketFileDescriptor, (const struct sockaddr*) name,
-             sizeof(*name) )== -1)
+             sizeof(*name)) == -1)
     {
         perror("bind");
         close(socketFileDescriptor);
@@ -34,7 +34,7 @@ int PrepareServerDgramSocket(int portNumber, struct sockaddr_in* name)
     return socketFileDescriptor;
 }
 
-int ConnectToDgramSocket(const char* inetAddress, int portNumber,
+/*int ConnectToDgramSocket(const char* inetAddress, int portNumber,
                          struct sockaddr_in* name)
 {
     memset((char*) name, 0, sizeof(*name));
@@ -54,13 +54,14 @@ int ConnectToDgramSocket(const char* inetAddress, int portNumber,
         return -1;
     }
     return socketFileDescriptor;
-}
+}*/
 
 void SendToSocket(int socketFileDescriptor, struct sockaddr_in name,
                   void* dataBuf, size_t size)
 {
     int sendResult;
-    printf("Sending following:\n%s\n%d", ((taskData*) dataBuf)->number, ((taskData*) dataBuf)->radix);
+    printf("Sending following:\n%s\n%d", ((taskData*) dataBuf)->number,
+           ((taskData*) dataBuf)->radix);
 
     sendResult = (int) sendto(socketFileDescriptor, dataBuf, size, 0,
                               (struct sockaddr*) &name, sizeof(name));
@@ -75,14 +76,15 @@ void SendToSocket(int socketFileDescriptor, struct sockaddr_in name,
 int receiveFromSocket(int socketFileDescriptor, struct sockaddr_in name,
                       void* dataBuf, size_t size)
 {
-    socklen_t nameLength = sizeof (name);
+    socklen_t nameLength = sizeof(name);
     int recvResult = (int) recvfrom(socketFileDescriptor, dataBuf, size,
-                              0, (struct sockaddr *) &name, &nameLength);
+                                    0, (struct sockaddr*) &name, &nameLength);
     if (recvResult <= 0)
     {
         perror("recvfrom");
         return -1;
     }
-    printf("Read\n%s\n%d", ((taskData*) dataBuf)->number, ((taskData*) dataBuf)->radix);
+    printf("Read\n%s\n%d", ((taskData*) dataBuf)->number,
+           ((taskData*) dataBuf)->radix);
     return 0;
 }

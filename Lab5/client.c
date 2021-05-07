@@ -20,65 +20,61 @@ typedef struct
 
 int main(int argc, const char* argv[])
 {
-    if (argc != 3)
+    if (argc != 5)
     {
-        fprintf(stderr, "Socket name and port number expected.\n");
+        fprintf(stderr, "Expected arguments:\nServer address\nPort"
+                        "number\nRadix (2-20)\nNumber (use \'A\' - \'J\' as"
+                        "digits for >10-based systems\n");
         return EXIT_FAILURE;
     }
 
     taskData* data;
-    data = (taskData*) malloc(sizeof (taskData));
+    data = (taskData*) malloc(sizeof(taskData));
 
     int portNumber = atoi(argv[2]);
     int socketFileDescriptor;
     struct sockaddr_in name;
     name.sin_family = AF_INET;
     name.sin_addr.s_addr = inet_addr(argv[1]);
-    if (INADDR_NONE == name.sin_addr.s_addr)
-    {
-        printf("Wrong address!\n");
-        exit(1);
-    }
+
     if ((portNumber > MAX_PORT_NUMBER) || (portNumber < MIN_PORT_NUMBER))
     {
-        printf("Wrong port!\n");
+        perror("bad_port");
         exit(1);
     }
-    memset((char *) &name, 0, sizeof (name));
-    if (INADDR_NONE == name.sin_addr.s_addr)
+    memset((char*) &name, 0, sizeof(name));
+    if (name.sin_addr.s_addr == INADDR_NONE)
     {
-        perror("inet_addr");
+        perror("bad_inet_addr");
         exit(1);
     }
-    name.sin_port = htons((u_short)portNumber);
+    name.sin_port = htons((u_short) portNumber);
     socketFileDescriptor = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (0 > socketFileDescriptor)
+    if (socketFileDescriptor < 0)
     {
-        perror("socket");
+        perror("bad_socket");
+        exit(1);
     }
 
-    do
+    char* strtolEndptr;
+    data->radix = (int8_t) strtol(argv[3], &strtolEndptr, 10);
+
+    if (*strtolEndptr != argv[3][strlen(argv[3])])
     {
-
-        printf("Enter base of numeral system (2 - 20)\n");
-        data->radix = (int8_t) CheckedInputInt(RadixInputCheck);
-        printf("Enter number in chosen system. Use \'A\' - \'J\' as"
-               "digits for >10-based systems\n");
-        while (true)
-        {
-            scanf("%s", data->number);
-            if (CheckIntOverflow(data->number, data->radix) &&
-                CheckRadixMatch(data->number, data->radix))
-            {
-                break;
-            }
-            printf("Wrong format or too big number!\n");
-        }
-
-
-        SendToSocket(socketFileDescriptor, name, data, sizeof(taskData));
-
-    } while (!0);
+        printf("Wrong radix!\n");
+        return 0;
+    }
+    if (!RadixInputCheck(data->radix))
+    {
+        printf("Wrong radix!\n");
+    }
+    strcpy(data->number, argv[4]);
+    if(!(CheckIntOverflow(data->number, data->radix) &&
+     CheckRadixMatch(data->number, data->radix)))
+    {
+        printf("Wrong number!\n");
+    }
+    SendToSocket(socketFileDescriptor, name, data, sizeof(taskData));
     close(socketFileDescriptor);
     return 0;
 }
