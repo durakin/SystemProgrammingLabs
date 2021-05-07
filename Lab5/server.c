@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include "input.h"
 #include "task14.h"
+#include "socketOperations.h"
 
 typedef struct
 {
@@ -22,16 +23,13 @@ int server(int serverSocket)
 
     while (!0)
     {
-        char* text = NULL;
-        int recvResult = (int) recvfrom(serverSocket, data, sizeof(taskData),
-                                        0,
-                                        (struct sockaddr*) &clientName,
-                                        &clientNameLength);
-        if (-1 == recvResult)
+        int recvResult = receiveFromSocket(serverSocket, clientName, data,
+                                           sizeof(taskData));
+        if (recvResult == -1)
         {
             perror("recvfrom");
         }
-        if (0 >= recvResult)
+        if (recvResult <= 0)
         {
             return 0;
         }
@@ -73,30 +71,18 @@ int main(int argc, char* const argv[])
         fprintf(stderr, "Too few parameters.\n");
         return EXIT_FAILURE;
     }
-    int socketFileDescriptor = -1;
+    int socketFileDescriptor;
     int portNumber = atoi(argv[1]);
-    struct sockaddr_in name;
-    int clientSentQuitMessage;
-    socketFileDescriptor = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    int i = 1;
-    setsockopt(socketFileDescriptor, SOL_SOCKET, SO_REUSEADDR,
-               (const char*) &i, sizeof(i)
-    );
-    bzero((char*) &name, sizeof(name));
-    name.sin_family = AF_INET;
-    name.sin_port = htons((u_short) portNumber);
-    name.sin_addr.s_addr = INADDR_ANY;
-    if (-1 == bind(socketFileDescriptor, (const struct sockaddr*) &name,
-                   sizeof(name)))
+    socketFileDescriptor = PrepareServerDgramSocket(portNumber);
+    if (socketFileDescriptor == -1)
     {
-        perror("bind ");
-        close(socketFileDescriptor);
-        exit(1);
+        return 0;
     }
+
     do
     {
-        clientSentQuitMessage = server(socketFileDescriptor);
-    } while (!clientSentQuitMessage);
+        server(socketFileDescriptor);
+    } while (true);
     close(socketFileDescriptor);
     return 0;
 }

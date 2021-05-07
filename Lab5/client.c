@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include "socketOperations.h"
 #include "input.h"
 #include "task14.h"
 
@@ -18,28 +19,24 @@ int main(int argc, const char* argv[])
 {
     if (argc != 3)
     {
-        fprintf(stderr, "Socketname and port number expected.\n");
+        fprintf(stderr, "Socket name and port number expected.\n");
         return EXIT_FAILURE;
     }
-    int socketFileDescriptor;
+
+
     int portNumber = atoi(argv[2]);
 
+
+
     struct sockaddr_in name;
-    memset((char*) &name, 0, sizeof(name));
-    name.sin_family = AF_INET;
-    name.sin_addr.s_addr = inet_addr(argv[1]);
-    if (INADDR_NONE == name.sin_addr.s_addr)
-    {
-        perror("inet_addr");
-        exit(1);
-    }
-    name.sin_port = htons((u_short) portNumber);
-    socketFileDescriptor = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (0 > socketFileDescriptor)
+    int socketFileDescriptor;
+
+    socketFileDescriptor = PrepareServerDgramSocket(portNumber, &name);
+    if (socketFileDescriptor < 0)
     {
         perror("socket");
     }
-    char message[256];
+
     taskData* data;
     data = (taskData*) malloc(sizeof(taskData));
 
@@ -61,15 +58,9 @@ int main(int argc, const char* argv[])
             printf("Wrong format or too big number!\n");
         }
 
-        int resSend = 0;
-        int length = strlen(message) + 1;
-        resSend = sendto(socketFileDescriptor, data, sizeof(taskData), 0,
-                         (struct sockaddr*) &name, sizeof(name)
-        );
-        if (0 > resSend)
-        {
-            perror("sendto");
-        }
+
+        SendToSocket(socketFileDescriptor, name, data, sizeof(taskData));
+
     } while (!0);
     close(socketFileDescriptor);
     return 0;
