@@ -4,10 +4,20 @@
  */
 
 #include <stdbool.h>
+#include "input.h"
+#include <inttypes.h>
 
 #ifndef LAB1_TASK14_H
 #define LAB1_TASK14_H
 
+
+typedef struct
+{
+    char number[INPUT_SIZE];
+    int8_t radix;
+} taskData;
+
+void PerformTask(taskData* data);
 
 /*! \brief Converts number in any (2-20) numeral system to decimal
  *

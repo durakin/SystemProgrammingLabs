@@ -6,6 +6,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 /*! \enum
  *  \brief  Essential constants for task 14
@@ -16,6 +17,38 @@ enum NumeralSystemsConstants
     MIN_RADIX = 2,     /** Minimal numeral system radix */
     MAX_RADIX = 20     /** Maximal numeral system radix for task */
 };
+
+void PerformTask(taskData* data)
+{
+    char reversedNumber[INPUT_SIZE];
+    char* number = data->number;
+    int8_t radix = data->radix;
+
+    for (int i = (int) strlen(number) - 1; i >= 0; i--)
+    {
+        reversedNumber[strlen(number) - (i + 1)] = number[i];
+    }
+    reversedNumber[strlen(number)] = '\0';
+
+    while (reversedNumber[strlen(reversedNumber) - 1] == '0')
+    {
+        reversedNumber[strlen(reversedNumber) - 1] = '\0';
+    }
+
+    printf("Original: %s\n", number);
+    printf("To decimal: %d\n",
+           AnyNumeralSystemToDecimal(number, radix));
+    printf("Reversed: %s\n", reversedNumber);
+    if (CheckIntOverflow(reversedNumber, radix))
+    {
+        printf("Reversed to decimal: %d\n",
+               AnyNumeralSystemToDecimal(reversedNumber, radix));
+    }
+    else
+    {
+        printf("Reversed number is too big");
+    }
+}
 
 int AnyNumeralSystemToDecimal(char* number, int radix)
 {

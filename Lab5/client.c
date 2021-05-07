@@ -4,18 +4,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include "socketOperations.h"
 #include "input.h"
 #include "task14.h"
-
-#define MAX_PORT_NUMBER 65365
-#define MIN_PORT_NUMBER 1024
-
-typedef struct
-{
-    char number[INPUT_SIZE];
-    int8_t radix;
-} taskData;
 
 
 int main(int argc, const char* argv[])
@@ -27,54 +17,59 @@ int main(int argc, const char* argv[])
                         "digits for >10-based systems\n");
         return EXIT_FAILURE;
     }
-
     taskData* data;
     data = (taskData*) malloc(sizeof(taskData));
 
-    int portNumber = atoi(argv[2]);
-    int socketFileDescriptor;
-    struct sockaddr_in name;
-    name.sin_family = AF_INET;
-    name.sin_addr.s_addr = inet_addr(argv[1]);
-
-    if ((portNumber > MAX_PORT_NUMBER) || (portNumber < MIN_PORT_NUMBER))
+    char* strtolEndptr;
+    data->radix = (int8_t) strtol(argv[3], &strtolEndptr, 10);
+    if (*strtolEndptr != argv[3][strlen(argv[3])])
     {
-        perror("bad_port");
+        perror("radix");
         exit(1);
     }
-    memset((char*) &name, 0, sizeof(name));
-    if (name.sin_addr.s_addr == INADDR_NONE)
+    if (!RadixInputCheck(data->radix))
     {
-        perror("bad_inet_addr");
+        printf("radix");
+        exit(1);
+    }
+    strcpy(data->number, argv[4]);
+    if (!(CheckIntOverflow(data->number, data->radix) &&
+          CheckRadixMatch(data->number, data->radix)))
+    {
+        perror("number format");
+        exit(1);
+    }
+
+
+    int socketFileDescriptor;
+    int portNumber = atoi(argv[2]);
+    struct sockaddr_in name;
+    memset((char*) &name, 0, sizeof(name));
+    name.sin_family = AF_INET;
+    name.sin_addr.s_addr = inet_addr(argv[1]);
+    if (INADDR_NONE == name.sin_addr.s_addr)
+    {
+        perror("inet_addr");
         exit(1);
     }
     name.sin_port = htons((u_short) portNumber);
     socketFileDescriptor = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (socketFileDescriptor < 0)
     {
-        perror("bad_socket");
+        perror("socket");
         exit(1);
     }
 
-    char* strtolEndptr;
-    data->radix = (int8_t) strtol(argv[3], &strtolEndptr, 10);
-
-    if (*strtolEndptr != argv[3][strlen(argv[3])])
+    int resSend;
+    resSend = (int) sendto(socketFileDescriptor, data, sizeof(taskData), 0,
+                     (struct sockaddr*) &name, sizeof(name));
+    if (0 > resSend)
     {
-        printf("Wrong radix!\n");
-        return 0;
+        perror("sendto");
+        exit(1);
     }
-    if (!RadixInputCheck(data->radix))
-    {
-        printf("Wrong radix!\n");
-    }
-    strcpy(data->number, argv[4]);
-    if(!(CheckIntOverflow(data->number, data->radix) &&
-     CheckRadixMatch(data->number, data->radix)))
-    {
-        printf("Wrong number!\n");
-    }
-    SendToSocket(socketFileDescriptor, name, data, sizeof(taskData));
     close(socketFileDescriptor);
+    free(data);
     return 0;
 }
+
