@@ -10,17 +10,6 @@
 #include "timer.h"
 
 
-/*! \brief Checks whether the file from the path exists or not
- *
- *  \param path Path to the file
- *
- *  \return true if exists, false otherwise
- */
-bool FileExistCheck(char* path)
-{
-    return (access(path, F_OK) == 0);
-}
-
 /*! \brief Writes info from buffer by pointer into file
  *
  *  \param fd    File descriptor
@@ -47,10 +36,6 @@ int WriteInfo(int fd, void* info, size_t size)
 
 int OpenFile(int* fd, char* filename)
 {
-    if (!FileExistCheck(filename))
-    {
-        return -1;
-    }
     *fd = open(filename, O_WRONLY | O_CREAT | O_APPEND);
     if (*fd < 0)
     {

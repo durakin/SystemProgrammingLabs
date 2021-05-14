@@ -81,13 +81,16 @@ int ServerTask(int serverSocket)
  */
 int main(int argc, char* const argv[])
 {
-    if (argc < 2)
+    if (argc < 4)
     {
-        fprintf(stderr, "Too few parameters.\n");
+        fprintf(stderr, "Expected arguments:\nPort number\n"
+                        "Log file name\nIdle timeout\n");
         return EXIT_FAILURE;
     }
     int socketFileDescriptor = -1;
     int portNumber = atoi(argv[1]);
+    strcpy(g_logPath, argv[2]);
+    g_idleTime = atoi(argv[1]);
     struct sockaddr_in name;
     socketFileDescriptor = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     int i = 1;
