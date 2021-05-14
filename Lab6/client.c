@@ -13,9 +13,12 @@
 #include "logOutput.h"
 #include "timer.h"
 
+
 char g_logPath[INPUT_SIZE] = "log";
 int g_idleTime = 10;
 
+/*! \brief Signal handler for server
+ */
 void ClientSignalHandler(int signum)
 {
     if (signum == SIGINT)
@@ -34,7 +37,6 @@ void ClientSignalHandler(int signum)
         exit(0);
     }
 }
-
 
 /*! \brief Catches ctrl+C signal, closes socket and terminates server
  *  \details Parses CL arguments, checks them and sends to the server
@@ -80,7 +82,6 @@ int main(int argc, const char* argv[])
         exit(1);
     }
 
-
     while (true)
     {
         printf("Enter base of numeral system (2 - 20)\n");
@@ -105,7 +106,6 @@ int main(int argc, const char* argv[])
         data = (taskData*) malloc(sizeof(taskData));
         strcpy(data->number, number);
         data->radix = radix;
-
 
         int resSend;
         resSend = (int) sendto(socketFileDescriptor, data, sizeof(taskData),

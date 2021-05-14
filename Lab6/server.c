@@ -13,9 +13,12 @@
 #include "logOutput.h"
 #include "timer.h"
 
+
 char g_logPath[INPUT_SIZE] = "log";
 int g_idleTime = 10;
 
+/*! \brief Signal handler for server
+ */
 void ServerSignalHandler(int signum)
 {
     if (signum == SIGINT)
@@ -75,8 +78,6 @@ int ServerTask(int serverSocket)
     free(data);
     return 0;
 }
-
-
 
 /*! \brief main function of server
  */

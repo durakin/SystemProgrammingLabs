@@ -3,12 +3,12 @@
  *          essential for task 14
  */
 
+#ifndef LAB1_TASK14_H
+#define LAB1_TASK14_H
+
 #include <stdbool.h>
 #include "input.h"
 #include <inttypes.h>
-
-#ifndef LAB1_TASK14_H
-#define LAB1_TASK14_H
 
 
 /*! \struct taskData

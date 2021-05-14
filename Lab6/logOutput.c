@@ -1,11 +1,13 @@
+/*! \file   logOutput.c
+ *  \brief  Implements functions declared in logOutput.h and defines
+ *  essential functions for it.
+ */
+
 #include "logOutput.h"
-#include <stdbool.h>
 #include <unistd.h>
-#include <sys/stat.h>
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
-#include <time.h>
 #include "input.h"
 #include "timer.h"
 
@@ -34,6 +36,16 @@ int WriteInfo(int fd, void* info, size_t size)
     return 0;
 }
 
+/*! \brief Opens file
+ *
+ *  \details Opens file, changes file descriptor by pointer and
+ *  reports errors.
+ *
+ *  \param fd        File descriptor pointer
+ *  \param filename  Name of file to open
+ *
+ *  \return 0 on success, -1 otherwise
+ */
 int OpenFile(int* fd, char* filename)
 {
     *fd = open(filename, O_WRONLY | O_CREAT | O_APPEND);
@@ -57,6 +69,5 @@ void WriteLogEntry(char* logPath, char* info)
     WriteInfo(fd, "\n", sizeof(char));
     WriteInfo(fd, info, INPUT_SIZE);
     WriteInfo(fd, "\n", sizeof(char));
-    fsync(fd);
     close(fd);
 }

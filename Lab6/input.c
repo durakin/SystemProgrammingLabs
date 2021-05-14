@@ -1,5 +1,10 @@
+/*! \file   input.c
+ *  \brief  Implements functions of input.h
+ */
+
 #include "input.h"
 #include "stdio.h"
+
 
 int CheckedInputInt(bool(* additionalCheck)(int))
 {
