@@ -81,7 +81,7 @@ int ServerTask(int serverSocket)
  */
 int main(int argc, char* const argv[])
 {
-    if (argc < 4)
+    if (argc != 4)
     {
         fprintf(stderr, "Expected arguments:\nPort number\n"
                         "Log file name\nIdle timeout\n");
@@ -90,7 +90,7 @@ int main(int argc, char* const argv[])
     int socketFileDescriptor = -1;
     int portNumber = atoi(argv[1]);
     strcpy(g_logPath, argv[2]);
-    g_idleTime = atoi(argv[1]);
+    g_idleTime = atoi(argv[3]);
     struct sockaddr_in name;
     socketFileDescriptor = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     int i = 1;

@@ -8,7 +8,32 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include "signal.h"
 #include "task14.h"
+#include "logOutput.h"
+#include "timer.h"
+
+char g_logPath[INPUT_SIZE] = "log";
+int g_idleTime = 10;
+
+void ClientSignalHandler(int signum)
+{
+    if (signum == SIGINT)
+    {
+        writeLogEntry(g_logPath,"Client terminated by Ctrl+C\n");
+        exit(0);
+    }
+    else if (signum == SIGALRM)
+    {
+        writeLogEntry(g_logPath, "Client terminated by timer\n");
+        exit(0);
+    }
+    else if (signum == SIGTERM)
+    {
+        writeLogEntry(g_logPath,"Client terminated by kill signal\n");
+        exit(0);
+    }
+}
 
 
 /*! \brief Catches ctrl+C signal, closes socket and terminates server
@@ -19,36 +44,43 @@ int main(int argc, const char* argv[])
     if (argc != 5)
     {
         fprintf(stderr, "Expected arguments:\nServer address\nPort"
-                        "number\nRadix (2-20)\nNumber (use \'A\' - \'J\' as"
-                        "digits for >10-based systems\n");
+                        "number\nLog file name\nIdle timeout\n");
         return EXIT_FAILURE;
     }
+    strcpy(g_logPath, argv[3]);
+    g_idleTime = atoi(argv[4]);
+
+    struct sigaction sa = CreateSAHandler(ClientSignalHandler);
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
+    sigaction(SIGALRM, &sa, NULL);
+
+    struct itimerval timer = InitTimer(g_idleTime, 0);
+    setitimer(ITIMER_REAL, &timer, NULL);
+
+
+    int8_t radix;
+    char number[INPUT_SIZE];
+    printf("Enter base of numeral system (2 - 20)\n");
+    radix = (int8_t) CheckedInputInt(RadixInputCheck);
+    printf("Enter number in chosen system. Use \'A\' - \'J\' as"
+           "digits for >10-based systems\n");
+    while (true)
+    {
+        scanf("%s", number);
+        if (CheckIntOverflow(number, radix) && CheckRadixMatch(number, radix))
+        {
+            break;
+        }
+        printf("Wrong format or too big number!\n");
+    }
+
+    RollbackTimer(&timer, g_idleTime, 0);
+
     taskData* data;
     data = (taskData*) malloc(sizeof(taskData));
-
-    char* strtolEndptr;
-    data->radix = (int8_t) strtol(argv[3], &strtolEndptr, 10);
-    if (*strtolEndptr != argv[3][strlen(argv[3])])
-    {
-        printf("Wrong radix format!\n");
-        free(data);
-        return 0;
-    }
-    if (!RadixInputCheck(data->radix))
-    {
-        printf("Wrong radix format!\n");
-        free(data);
-        return 0;
-    }
-    strcpy(data->number, argv[4]);
-    if (!(CheckIntOverflow(data->number, data->radix) &&
-          CheckRadixMatch(data->number, data->radix)))
-    {
-        printf("Wrong number format!\n");
-        free(data);
-        return 0;
-    }
-
+    strcpy(data->number, number);
+    data->radix = radix;
 
     int socketFileDescriptor;
     int portNumber = atoi(argv[2]);

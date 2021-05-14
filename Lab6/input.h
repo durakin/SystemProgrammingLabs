@@ -15,5 +15,7 @@ enum Sizes
     INPUT_SIZE = 200
 };
 
+int CheckedInputInt(bool(* additionalCheck)(int));
+
 
 #endif //LAB1_INPUT_H
