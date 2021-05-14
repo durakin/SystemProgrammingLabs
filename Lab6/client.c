@@ -20,17 +20,17 @@ void ClientSignalHandler(int signum)
 {
     if (signum == SIGINT)
     {
-        writeLogEntry(g_logPath,"Client terminated by Ctrl+C\n");
+        WriteLogEntry(g_logPath, "Client terminated by Ctrl+C\n");
         exit(0);
     }
     else if (signum == SIGALRM)
     {
-        writeLogEntry(g_logPath, "Client terminated by timer\n");
+        WriteLogEntry(g_logPath, "Client terminated by timer\n");
         exit(0);
     }
     else if (signum == SIGTERM)
     {
-        writeLogEntry(g_logPath,"Client terminated by kill signal\n");
+        WriteLogEntry(g_logPath, "Client terminated by kill signal\n");
         exit(0);
     }
 }
@@ -58,29 +58,8 @@ int main(int argc, const char* argv[])
     struct itimerval timer = InitTimer(g_idleTime, 0);
     setitimer(ITIMER_REAL, &timer, NULL);
 
-
     int8_t radix;
     char number[INPUT_SIZE];
-    printf("Enter base of numeral system (2 - 20)\n");
-    radix = (int8_t) CheckedInputInt(RadixInputCheck);
-    printf("Enter number in chosen system. Use \'A\' - \'J\' as"
-           "digits for >10-based systems\n");
-    while (true)
-    {
-        scanf("%s", number);
-        if (CheckIntOverflow(number, radix) && CheckRadixMatch(number, radix))
-        {
-            break;
-        }
-        printf("Wrong format or too big number!\n");
-    }
-
-    RollbackTimer(&timer, g_idleTime, 0);
-
-    taskData* data;
-    data = (taskData*) malloc(sizeof(taskData));
-    strcpy(data->number, number);
-    data->radix = radix;
 
     int socketFileDescriptor;
     int portNumber = atoi(argv[2]);
@@ -91,7 +70,6 @@ int main(int argc, const char* argv[])
     if (INADDR_NONE == name.sin_addr.s_addr)
     {
         perror("inet_addr");
-        free(data);
         exit(1);
     }
     name.sin_port = htons((u_short) portNumber);
@@ -99,21 +77,50 @@ int main(int argc, const char* argv[])
     if (socketFileDescriptor < 0)
     {
         perror("socket");
-        free(data);
         exit(1);
     }
 
-    int resSend;
-    resSend = (int) sendto(socketFileDescriptor, data, sizeof(taskData), 0,
-                           (struct sockaddr*) &name, sizeof(name));
-    if (0 > resSend)
+
+    while (true)
     {
-        perror("sendto");
+        printf("Enter base of numeral system (2 - 20)\n");
+        radix = (int8_t) CheckedInputInt(RadixInputCheck);
+        printf("Enter number in chosen system. Use \'A\' - \'J\' as"
+               "digits for >10-based systems\n");
+
+        while (true)
+        {
+            scanf("%s", number);
+            if (CheckIntOverflow(number, radix) &&
+                CheckRadixMatch(number, radix))
+            {
+                break;
+            }
+            printf("Wrong format or too big number!\n");
+        }
+
+        RollbackTimer(&timer, g_idleTime, 0);
+
+        taskData* data;
+        data = (taskData*) malloc(sizeof(taskData));
+        strcpy(data->number, number);
+        data->radix = radix;
+
+
+        int resSend;
+        resSend = (int) sendto(socketFileDescriptor, data, sizeof(taskData),
+                               0,
+                               (struct sockaddr*) &name, sizeof(name));
+        if (0 > resSend)
+        {
+            perror("sendto");
+            free(data);
+            exit(1);
+        }
+        WriteLogEntry(g_logPath, "Sent task\n");
         free(data);
-        exit(1);
     }
     close(socketFileDescriptor);
-    free(data);
     return 0;
 }
 

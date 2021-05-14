@@ -44,7 +44,7 @@ int OpenFile(int* fd, char* filename)
     return 0;
 }
 
-void writeLogEntry(char* logPath, char* info)
+void WriteLogEntry(char* logPath, char* info)
 {
     int fd;
     if (OpenFile(&fd, logPath) != 0)

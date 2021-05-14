@@ -6,6 +6,6 @@
 #define LOGOUTPUT_H
 
 
-void writeLogEntry(char* logPath, char* info);
+void WriteLogEntry(char* logPath, char* info);
 
 #endif //LOGOUTPUT_H

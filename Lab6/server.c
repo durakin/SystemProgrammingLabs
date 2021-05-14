@@ -20,17 +20,17 @@ void ServerSignalHandler(int signum)
 {
     if (signum == SIGINT)
     {
-        writeLogEntry(g_logPath,"Server terminated by Ctrl+C\n");
+        WriteLogEntry(g_logPath, "Server terminated by Ctrl+C\n");
         exit(0);
     }
     else if (signum == SIGALRM)
     {
-        writeLogEntry(g_logPath, "Server terminated by timer\n");
+        WriteLogEntry(g_logPath, "Server terminated by timer\n");
         exit(0);
     }
     else if (signum == SIGTERM)
     {
-        writeLogEntry(g_logPath,"Server terminated by kill signal\n");
+        WriteLogEntry(g_logPath, "Server terminated by kill signal\n");
         exit(0);
     }
 }
@@ -67,6 +67,7 @@ int ServerTask(int serverSocket)
         }
         if (recvResult > 0)
         {
+            WriteLogEntry(g_logPath, "Got new task\n");
             PerformTask(data);
             RollbackTimer(&timer, g_idleTime, 0);
         }
