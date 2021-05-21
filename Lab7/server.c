@@ -12,7 +12,7 @@
 #include "task14.h"
 #include "logOutput.h"
 #include "timer.h"
-#include "ServerFunctions.h"
+#include "serverFunctions.h"
 
 
 char g_logPath[INPUT_SIZE];
