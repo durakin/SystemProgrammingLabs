@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include "input.h"
 #include "timer.h"
+#include <sys/vfs.h>
 
 
 /*! \brief Writes info from buffer by pointer into file
@@ -49,11 +50,19 @@ int WriteInfo(int fd, void* info, size_t size)
 int OpenFile(int* fd, char* filename)
 {
     *fd = open(filename, O_WRONLY | O_CREAT | O_APPEND);
+    write(*fd, "", 0);
     if (*fd < 0)
     {
         return -1;
     }
     return 0;
+}
+
+unsigned long fsFreeSize(char* vfsPath)
+{
+    struct statfs buf;
+    statfs(vfsPath, &buf);
+    return buf.f_bfree;
 }
 
 void WriteLogEntry(char* logPath, char* info)

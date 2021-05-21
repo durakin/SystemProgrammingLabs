@@ -13,4 +13,6 @@
  */
 void WriteLogEntry(char* logPath, char* info);
 
+unsigned long fsFreeSize(char* vfsPath);
+
 #endif //LOGOUTPUT_H

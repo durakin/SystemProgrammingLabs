@@ -12,27 +12,48 @@
 #include "task14.h"
 #include "logOutput.h"
 #include "timer.h"
+#include "ServerFunctions.h"
 
 
-char g_logPath[INPUT_SIZE] = "log";
+char g_logPath[INPUT_SIZE];
 int g_idleTime = 10;
 
 /*! \brief Signal handler for server
  */
-void ServerSignalHandler(int signum)
+void ServerTimerHandler(int signum)
 {
-    if (signum == SIGINT)
+    if (signum == SIGALRM)
     {
-        WriteLogEntry(g_logPath, "Server terminated by Ctrl+C\n");
-        exit(0);
-    }
-    else if (signum == SIGALRM)
-    {
+        if (access(PATH_TO_CHECK_FILE, F_OK) == 0)
+        {
+            remove(PATH_TO_CHECK_FILE);
+        }
         WriteLogEntry(g_logPath, "Server terminated by timer\n");
         exit(0);
     }
-    else if (signum == SIGTERM)
+}
+
+void ServerInterruptHandler(int signum)
+{
+    if (signum == SIGINT)
     {
+        if (access(PATH_TO_CHECK_FILE, F_OK) == 0)
+        {
+            remove(PATH_TO_CHECK_FILE);
+        }
+        WriteLogEntry(g_logPath, "Server terminated by Ctrl+C\n");
+        exit(0);
+    }
+}
+
+void ServerTerminateHandler(int signum)
+{
+    if (signum == SIGTERM)
+    {
+        if (access(PATH_TO_CHECK_FILE, F_OK) == 0)
+        {
+            remove(PATH_TO_CHECK_FILE);
+        }
         WriteLogEntry(g_logPath, "Server terminated by kill signal\n");
         exit(0);
     }
@@ -49,10 +70,12 @@ int ServerTask(int serverSocket)
     taskData* data;
     data = (taskData*) malloc(sizeof(taskData));
 
-    struct sigaction sa = CreateSAHandler(ServerSignalHandler);
-    sigaction(SIGINT, &sa, NULL);
-    sigaction(SIGTERM, &sa, NULL);
-    sigaction(SIGALRM, &sa, NULL);
+    struct sigaction saTimer = CreateSAHandler(ServerTimerHandler);
+    sigaction(SIGALRM, &saTimer, NULL);
+    struct sigaction saInterrupt = CreateSAHandler(ServerInterruptHandler);
+    sigaction(SIGINT, &saInterrupt, NULL);
+    struct sigaction saTerminate = CreateSAHandler(ServerTerminateHandler);
+    sigaction(SIGTERM, &saTerminate, NULL);
 
     struct itimerval timer = InitTimer(g_idleTime, 0);
     setitimer(ITIMER_REAL, &timer, NULL);
@@ -75,6 +98,10 @@ int ServerTask(int serverSocket)
             RollbackTimer(&timer, g_idleTime, 0);
         }
     }
+    if (access(PATH_TO_CHECK_FILE, F_OK) == 0)
+    {
+        remove(PATH_TO_CHECK_FILE);
+    }
     free(data);
     return 0;
 }
@@ -83,16 +110,85 @@ int ServerTask(int serverSocket)
  */
 int main(int argc, char* const argv[])
 {
-    if (argc != 4)
+    if (isatty(STDIN_FILENO) == 0)
     {
-        fprintf(stderr, "Expected arguments:\nPort number\n"
-                        "Log file name\nIdle timeout\n");
-        return EXIT_FAILURE;
+        fprintf(stderr, "Streams redirection is prohibited\n");
+        exit(EXIT_FAILURE);
     }
-    int socketFileDescriptor = -1;
-    int portNumber = atoi(argv[1]);
-    strcpy(g_logPath, argv[2]);
-    g_idleTime = atoi(argv[3]);
+
+    int portNumber;
+    bool helpRequested = false;
+    bool portNumberParsed = false;
+    bool logPathParsed = false;
+    bool idleTimeParsed = false;
+    bool checkDisks = false;
+    int result;
+    while ((result = getopt(argc, argv, "hp:l:t:c")) != -1)
+    {
+        switch (result)
+        {
+            case 'h':
+                helpRequested = true;
+                break;
+
+            case 'p':
+                portNumber = atoi(optarg);
+                if (MIN_PORT <= portNumber && portNumber <= MAX_PORT)
+                {
+                    portNumberParsed = true;
+                }
+                break;
+            case 'l':
+                strcpy(g_logPath, optarg);
+                logPathParsed = true;
+                break;
+            case 't':
+                g_idleTime = atoi(optarg);
+                if (g_idleTime > 0)
+                {
+                    idleTimeParsed = true;
+                }
+                break;
+            case 'c':
+                checkDisks = true;
+                break;
+        }
+    }
+    if (helpRequested || argc == 1)
+    {
+        {
+            fprintf(stdout, "Expected arguments:\n-p - Port number\n"
+                            "\n-l - Log file path\n"
+                            "\n-t - Idle g_idleTime\n"
+                            "\n-c - Set file system occupancy");
+            return EXIT_SUCCESS;
+        }
+    }
+    if (!portNumberParsed)
+    {
+        fprintf(stderr, "Valid ort number expected\n");
+        exit(EXIT_FAILURE);
+    }
+    if (!logPathParsed)
+    {
+        fprintf(stderr, "Log file name expected\n");
+        exit(EXIT_FAILURE);
+    }
+    if (!idleTimeParsed)
+    {
+        fprintf(stderr, "Valid idle time expected\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (checkDisks)
+    {
+        fprintf(stdout, "Free space on FS: %lu blocks\n",
+                fsFreeSize(g_logPath));
+    }
+
+    ServerCheckRunning(portNumber);
+
+    int socketFileDescriptor;
     struct sockaddr_in name;
     socketFileDescriptor = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     int i = 1;
