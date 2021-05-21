@@ -18,7 +18,7 @@
 char g_logPath[INPUT_SIZE];
 int g_idleTime = 10;
 
-/*! \brief Signal handler for server
+/*! \brief SIGALRM signal handler for server
  */
 void ServerTimerHandler(int signum)
 {
@@ -33,6 +33,8 @@ void ServerTimerHandler(int signum)
     }
 }
 
+/*! \brief SIGINT signal handler for server
+ */
 void ServerInterruptHandler(int signum)
 {
     if (signum == SIGINT)
@@ -46,6 +48,8 @@ void ServerInterruptHandler(int signum)
     }
 }
 
+/*! \brief SIGTERM signal handler for server
+ */
 void ServerTerminateHandler(int signum)
 {
     if (signum == SIGTERM)
@@ -123,7 +127,7 @@ int main(int argc, char** argv)
     bool idleTimeParsed = false;
     bool checkDisks = false;
     int result;
-    while ((result = getopt(argc, argv, "h:p:l:t:c")) != -1)
+    while ((result = getopt(argc, argv, "hp:l:t:c")) != -1)
     {
         switch (result)
         {
@@ -183,7 +187,7 @@ int main(int argc, char** argv)
     if (checkDisks)
     {
         fprintf(stdout, "Free space on FS: %lu blocks\n",
-                fsFreeSize(g_logPath));
+                FsFreeSize(g_logPath));
     }
 
     ServerCheckRunning(portNumber);

@@ -16,10 +16,10 @@
 #define MIN_PORT 1024
 #define MAX_PORT 65635
 
-char g_logPath[INPUT_SIZE] = "log";
-int g_idleTime = 10;
+char g_logPath[INPUT_SIZE];
+int g_idleTime;
 
-/*! \brief Signal handler for server
+/*! \brief SIGALRM signal handler for client
  */
 void ClientTimerHandler(int signum)
 {
@@ -30,6 +30,8 @@ void ClientTimerHandler(int signum)
     }
 }
 
+/*! \brief SIGINT signal handler for client
+ */
 void ClientInterruptHandler(int signum)
 {
     if (signum == SIGINT)
@@ -39,6 +41,8 @@ void ClientInterruptHandler(int signum)
     }
 }
 
+/*! \brief SIGTERM signal handler for client
+ */
 void ClientTerminateHandler(int signum)
 {
     if (signum == SIGTERM)
@@ -67,7 +71,7 @@ int main(int argc, char** argv)
     bool logPathParsed = false;
     bool idleTimeParsed = false;
     int result;
-    while ((result = getopt(argc, argv, "h:a:p:l:t")) != -1)
+    while ((result = getopt(argc, argv, "ha:p:l:t:")) != -1)
     {
         switch (result)
         {

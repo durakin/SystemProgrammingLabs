@@ -1,3 +1,7 @@
+/*! \file   ServerFunctions.c
+ *  \brief  Implements function from ServerFunction.h
+ */
+
 #include <unistd.h>
 #include <stdio.h>
 #include <fcntl.h>

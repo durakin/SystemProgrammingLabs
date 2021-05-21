@@ -18,7 +18,6 @@ char* GetTimeString()
     return (result);
 }
 
-
 struct itimerval InitTimer(int sec, int usec)
 {
     struct itimerval timer;

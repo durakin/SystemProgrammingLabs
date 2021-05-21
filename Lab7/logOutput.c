@@ -58,7 +58,7 @@ int OpenFile(int* fd, char* filename)
     return 0;
 }
 
-unsigned long fsFreeSize(char* vfsPath)
+unsigned long FsFreeSize(char* vfsPath)
 {
     struct statfs buf;
     statfs(vfsPath, &buf);

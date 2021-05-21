@@ -13,6 +13,12 @@
  */
 void WriteLogEntry(char* logPath, char* info);
 
-unsigned long fsFreeSize(char* vfsPath);
+/*! \brief Returns free size of file system
+ *
+ *  \param vfsPath Path to vfs
+ *
+ *  \return Number of free blocks
+ */
+unsigned long FsFreeSize(char* vfsPath);
 
 #endif //LOGOUTPUT_H
