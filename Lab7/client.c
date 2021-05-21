@@ -57,7 +57,12 @@ void ClientTerminateHandler(int signum)
  */
 int main(int argc, char** argv)
 {
-    if (isatty(STDIN_FILENO) == 0)
+    if (!isatty(STDIN_FILENO))
+    {
+        fprintf(stderr, "Streams redirection is prohibited\n");
+        exit(EXIT_FAILURE);
+    }
+    if (!isatty(STDOUT_FILENO))
     {
         fprintf(stderr, "Streams redirection is prohibited\n");
         exit(EXIT_FAILURE);
