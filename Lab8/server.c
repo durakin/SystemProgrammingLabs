@@ -193,7 +193,6 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
-    ServerCheckRunning(portNumber);
 
     if (checkDisks)
     {
@@ -208,6 +207,8 @@ int main(int argc, char** argv)
             exit(EXIT_FAILURE);
         }
     }
+
+    ServerCheckRunning(portNumber);
 
     int socketFileDescriptor;
     struct sockaddr_in name;

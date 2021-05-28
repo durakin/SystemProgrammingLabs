@@ -18,10 +18,6 @@ void CheckRoot()
         fprintf(stderr, "Server can only be started by root\n");
         exit(EXIT_FAILURE);
     }
-    if (access(PATH_TO_CHECK_FILE, F_OK) == 0)
-    {
-        remove(PATH_TO_CHECK_FILE);
-    }
 }
 
 void CheckAuthentication()
